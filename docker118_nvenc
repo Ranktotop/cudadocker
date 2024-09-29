@@ -1,4 +1,4 @@
-FROM ranktotop/cudadocker:118
+FROM nvidia/cuda:11.8.0-cudnn8-devel-ubuntu22.04
 
 RUN apt-get update && apt-get install -y \
     build-essential \
@@ -7,6 +7,10 @@ RUN apt-get update && apt-get install -y \
     nasm \
     gcc \
     g++ \
+    curl \
+    git \
+    nano \
+    iputils-ping \
     cmake \
     libx264-dev \
     libx265-dev \
