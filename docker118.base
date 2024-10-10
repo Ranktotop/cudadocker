@@ -48,7 +48,7 @@ RUN apt-get update && apt-get install -y \
 RUN apt-get remove -y --allow-change-held-packages libcudnn8 libcudnn8-dev
 
 # Download and install cuDNN 8.7 for CUDA 11.x (use the correct link from NVIDIA)
-RUN wget https://developer.nvidia.com/downloads/c118-cudnn-local-repo-ubuntu2004-8708410-1amd64deb -O cudnn-local-repo.deb && \
+RUN wget https://www.dropbox.com/s/1gyydjb7vpb75ru/cudnn-local-repo-ubuntu2004-8.7.0.84_1.0-1_amd64.deb?st=9rmawcqo -O cudnn-local-repo.deb && \
     dpkg -i cudnn-local-repo.deb && \
     apt-key add /var/cudnn-local-repo-*/7fa2af80.pub && \
     apt-get update && apt-get install -y libcudnn8=8.7.0.84-1+cuda11.8 libcudnn8-dev=8.7.0.84-1+cuda11.8 && \
