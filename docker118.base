@@ -30,6 +30,7 @@ RUN apt-get update && apt-get install -y \
     libxcb1 \
     libxcb-cursor0 \
     python3-pip \
+    wget \
     curl \
     git \
     nano \
@@ -39,7 +40,27 @@ RUN apt-get update && apt-get install -y \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# install tensorRT
+#######################################
+########## DOWNGRADE cuDNN ############
+#######################################
+
+# Remove existing cuDNN 8.9
+RUN apt-get remove -y libcudnn8 libcudnn8-dev
+
+# Download and install cuDNN 8.7 for CUDA 11.x (use the correct link from NVIDIA)
+RUN wget https://developer.nvidia.com/downloads/c118-cudnn-local-repo-ubuntu2004-8708410-1amd64deb -O cudnn-local-repo.deb && \
+    dpkg -i cudnn-local-repo.deb && \
+    apt-key add /var/cudnn-local-repo-*/7fa2af80.pub && \
+    apt-get update && apt-get install -y libcudnn8=8.7.0.84-1+cuda11.8 libcudnn8-dev=8.7.0.84-1+cuda11.8 && \
+    rm cudnn-local-repo.deb
+
+# Update dynamic linker run-time bindings
+RUN ldconfig
+
+#######################################
+######### INSTALL TENSORRT ############
+#######################################
+
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     libnvinfer8=8.5.1-1+cuda11.8 \
