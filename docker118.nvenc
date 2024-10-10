@@ -1,4 +1,4 @@
-FROM ranktotop/cudadocker:118
+FROM ranktotop/cudadocker:118_base
 
 RUN apt-get update && apt-get install -y \
     build-essential \
