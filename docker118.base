@@ -45,7 +45,7 @@ RUN apt-get update && apt-get install -y \
 #######################################
 
 # Remove existing cuDNN 8.9
-RUN apt-get remove -y libcudnn8 libcudnn8-dev
+RUN apt-get remove -y --allow-change-held-packages libcudnn8 libcudnn8-dev
 
 # Download and install cuDNN 8.7 for CUDA 11.x (use the correct link from NVIDIA)
 RUN wget https://developer.nvidia.com/downloads/c118-cudnn-local-repo-ubuntu2004-8708410-1amd64deb -O cudnn-local-repo.deb && \
