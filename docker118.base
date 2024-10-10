@@ -50,8 +50,8 @@ RUN apt-get remove -y --allow-change-held-packages libcudnn8 libcudnn8-dev
 # Download and install cuDNN 8.7 for CUDA 11.x from Dropbox
 RUN wget https://www.dropbox.com/s/1gyydjb7vpb75ru/cudnn-local-repo-ubuntu2004-8.7.0.84_1.0-1_amd64.deb?dl=1 -O cudnn-local-repo.deb && \
     dpkg -i cudnn-local-repo.deb && \
-    cp /var/cudnn-local-repo-ubuntu2004-8.7.0.84/cudnn-local-A3837CDF-keyring.gpg /usr/share/keyrings/ && \
-    echo "deb [trusted=yes] file:/var/cudnn-local-repo-ubuntu2004-8.7.0.84/ /" > /etc/apt/sources.list.d/cudnn-local.list && \
+    cp /var/cudnn-local-repo-ubuntu2004-8.7.0.84/cudnn-local-A3837CDF-keyring.gpg /usr/share/keyrings/cudnn-local-keyring.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/cudnn-local-keyring.gpg] file:/var/cudnn-local-repo-ubuntu2004-8.7.0.84/ /" > /etc/apt/sources.list.d/cudnn-local.list && \
     apt-get update && apt-get install -y libcudnn8=8.7.0.84-1+cuda11.8 libcudnn8-dev=8.7.0.84-1+cuda11.8 && \
     rm cudnn-local-repo.deb
 
