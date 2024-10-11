@@ -1,0 +1,58 @@
+FROM nvidia/cuda:11.8.0-cudnn8-devel-ubuntu22.04
+#FROM nvidia/cuda:12.6.1-cudnn-devel-ubuntu22.04
+
+# Tell the CUDA environment what GPU features to expose in the container.
+ENV NVIDIA_DRIVER_CAPABILITIES=all
+ENV NVIDIA_VISIBLE_DEVICES=all
+ENV CUDA_VISIBLE_DEVICES=all
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gstreamer1.0-alsa \
+    gstreamer1.0-gl \
+    gstreamer1.0-gtk3 \
+    gstreamer1.0-libav \
+    gstreamer1.0-plugins-bad \
+    gstreamer1.0-plugins-base \
+    gstreamer1.0-plugins-good \
+    gstreamer1.0-plugins-ugly \
+    gstreamer1.0-pulseaudio \
+    gstreamer1.0-qt5 \
+    gstreamer1.0-tools \
+    gstreamer1.0-x \
+    libgstreamer-plugins-bad1.0-dev \
+    libgstreamer-plugins-base1.0-dev \
+    libgstreamer1.0-dev \
+    libgtk2.0-0 \
+    libunwind-dev \
+    ffmpeg \
+    libvulkan1 \
+    libxcb-xkb1 \
+    libxcb1 \
+    libxcb-cursor0 \
+    python3-pip \
+    wget \
+    curl \
+    git \
+    nano \
+    iputils-ping \
+    net-tools \
+    fonts-inter \
+    sudo \
+    vim \
+    htop &&\
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Create a non-root user (optional, but recommended for security)
+RUN useradd -m -s /bin/bash appuser && echo "appuser:appuser" | chpasswd && usermod -aG sudo appuser
+
+# Set working directory
+WORKDIR /home/appuser
+
+# Switch to non-root user (optional)
+USER appuser
+
+# Keep the container running
+CMD ["sleep", "infinity"]
