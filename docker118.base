@@ -44,7 +44,7 @@ RUN apt-get update && apt-get install -y \
 ########## DOWNGRADE cuDNN ############
 #######################################
 
-# Remove existing cuDNN 8.9
+# Remove existing cuDNN 8.9 for getting compatibility with tensorflow 2.14
 RUN apt-get update && apt-get remove -y --allow-change-held-packages libcudnn8 libcudnn8-dev
 
 # Fügen Sie das NVIDIA-Paket-Repository hinzu
