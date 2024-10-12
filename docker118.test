@@ -45,3 +45,15 @@ ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64/stubs:$LD_LIBRARY_PATH
 RUN ln -s /usr/local/cuda/lib64/stubs/libcuda.so /usr/lib/libcuda.so && \
     ln -s /usr/local/cuda/lib64/stubs/libnvcuvid.so /usr/lib/libnvcuvid.so && \
     ln -s /usr/local/cuda/lib64/stubs/libnvidia-encode.so /usr/lib/libnvidia-encode.so
+
+# Create a non-root user (optional, but recommended for security)
+RUN useradd -m -s /bin/bash appuser && echo "appuser:appuser" | chpasswd && usermod -aG sudo appuser
+
+# Set working directory
+WORKDIR /home/appuser
+
+# Switch to non-root user (optional)
+USER appuser
+
+# Keep the container running
+CMD ["sleep", "infinity"]
