@@ -64,6 +64,7 @@ RUN ldconfig
 RUN ln -s /usr/lib/x86_64-linux-gnu/libcudnn.so.8 /usr/local/cuda/lib64/libcudnn.so.8 && \
     ln -s /usr/lib/x86_64-linux-gnu/libcudnn.so.8.7.0 /usr/local/cuda/lib64/libcudnn.so.8.7.0 && \
     ln -s /usr/lib/x86_64-linux-gnu/libcudnn.so /usr/local/cuda/lib64/libcudnn.so
+ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
 
 #######################################
 ######### INSTALL TENSORRT ############
