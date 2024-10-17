@@ -60,6 +60,12 @@ RUN wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86
 # Update dynamic linker run-time bindings
 RUN ldconfig
 
+# Erstelle die Symlinks für cuDNN-Bibliotheken
+RUN ln -s /usr/lib/x86_64-linux-gnu/libcudnn.so.8 /usr/local/cuda/lib64/libcudnn.so.8 && \
+    ln -s /usr/lib/x86_64-linux-gnu/libcudnn.so.8.7.0 /usr/local/cuda/lib64/libcudnn.so.8.7.0 && \
+    ln -s /usr/lib/x86_64-linux-gnu/libcudnn.so /usr/local/cuda/lib64/libcudnn.so
+
+
 #######################################
 ######### INSTALL TENSORRT ############
 #######################################
