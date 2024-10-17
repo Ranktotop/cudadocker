@@ -48,14 +48,8 @@ RUN apt-get update && apt-get install -y \
 # Remove existing cuDNN 8.9 for installing cuDNN 8.7
 RUN apt-get update && apt-get remove -y --allow-change-held-packages libcudnn8 libcudnn8-dev
 
-# Fügen Sie das NVIDIA-Paket-Repository hinzu
-RUN apt-get update && apt-get install -y wget gnupg && \
-    wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.1-1_all.deb && \
-    dpkg -i cuda-keyring_1.1-1_all.deb && \
-    apt-get update
-
 # Install cuDNN 8.7 for getting compatibility with tensorflow 2.14
-RUN apt-get install -y libcudnn8=8.7.0.*-1+cuda11.8 libcudnn8-dev=8.7.0.*-1+cuda11.8
+RUN apt-get install -y libcudnn8-dev_8.7.0.84-1+cuda11.8_amd64.deb
 
 # Update dynamic linker run-time bindings
 RUN ldconfig
