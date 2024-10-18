@@ -1,4 +1,37 @@
 #################################
+####### register logging ########
+#################################
+import logging
+import os
+
+# Setze den LD_LIBRARY_PATH vor allen anderen Imports
+os.environ['LD_LIBRARY_PATH'] = '/usr/local/cuda/lib64'
+
+logging.basicConfig(
+    level=logging.INFO,  # Legt die niedrigste Protokollierungsstufe fest
+    format='%(asctime)s - %(levelname)s - %(message)s',  # Format der Log-Nachrichten
+    datefmt='%d.%m.%Y %H:%M:%S',  # Format des Datums und der Uhrzeit
+    handlers=[
+        logging.FileHandler("/home/appuser/gputest/logs/app.log"),  # Loggt Nachrichten in eine Datei
+        logging.StreamHandler()  # Loggt Nachrichten in die Konsole
+    ]
+)
+
+#################################
+####### Importiere Module #######
+#################################
+import sys
+import cv2
+import keras  # Importiere keras direkt für die Versionsabfrage
+from ultralytics import YOLO
+from keras.models import load_model
+from keras.preprocessing import image
+import numpy as np
+from collections import defaultdict
+
+import tensorflow as tf
+
+#################################
 ##### Lade Modelle ##############
 #################################
 try:
