@@ -1,6 +1,7 @@
 import logging
 import torch
 import torchaudio
+import faulthandler
 
 #################################
 ####### register logging ########
@@ -26,6 +27,7 @@ logging.info(f"Verwendetes Gerät: {device}")
 sample_rate = 16000
 duration = 1  # in Sekunden
 try:
+    faulthandler.enable()
     logging.info("Erstelle zufällige Wellenform...")
     waveform = torch.randn(1, sample_rate * duration).to(device)
     logging.info("Wellenform erstellt.")
@@ -39,6 +41,7 @@ try:
     logging.info("Transformation angewendet.")
 
     logging.info("Torchaudio nutzt die GPU für Transformationen.")
+    faulthandler.disable()
 except Exception as e:
     logging.error(f"Fehler bei der Verwendung von torchaudio: {str(e)}")
 
