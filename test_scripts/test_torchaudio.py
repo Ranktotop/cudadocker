@@ -1,30 +1,34 @@
-#################################
-####### register logging ########
-#################################
 import logging
+import torch
+import torchaudio
+
 logging.basicConfig(
-    level=logging.INFO,  # Legt die niedrigste Protokollierungsstufe fest
-    format='%(asctime)s - %(levelname)s - %(message)s',  # Format der Log-Nachrichten
-    datefmt='%d.%m.%Y %H:%M:%S',  # Format des Datums und der Uhrzeit
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    datefmt='%d.%m.%Y %H:%M:%S',
     handlers=[
-        logging.FileHandler("/home/appuser/gputest/logs/app.log"),  # Loggt Nachrichten in eine Datei
-        logging.StreamHandler()  # Loggt Nachrichten in die Konsole
+        logging.FileHandler("/home/appuser/gputest/logs/app.log"),
+        logging.StreamHandler()
     ]
 )
 
-import torchaudio
-import torch
-
 logging.info("=== Torchaudio Test ===")
-# Überprüfe, ob CUDA verfügbar ist
-logging.info(f"CUDA verfügbar (Torchaudio): {torch.cuda.is_available()}")
-logging.info(f"CUDA Version (Torchaudio): {torch.version.cuda}")
-logging.info(f"cuDNN Version (Torchaudio): {torch.backends.cudnn.version()}")
 
-# Teste, ob ein einfacher Audio-Tensor auf die GPU geladen werden kann
+# Überprüfe, ob CUDA verfügbar ist
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+logging.info(f"CUDA verfügbar: {torch.cuda.is_available()}")
+logging.info(f"Verwendetes Gerät: {device}")
+
 try:
-    audio_tensor = torch.randn(16000)  # Erstelle einen simulierten Audiotensor
-    audio_tensor = audio_tensor.to('cuda' if torch.cuda.is_available() else 'cpu')
-    logging.info("Torchaudio nutzt die GPU.")
-except RuntimeError as e:
-    logging.error(f"Torchaudio konnte nicht auf die GPU zugreifen: {str(e)}")
+    # Generiere ein zufälliges Audiosignal (Wellenform)
+    sample_rate = 16000
+    duration = 1  # in Sekunden
+    waveform = torch.randn(1, sample_rate * duration).to(device)
+
+    # Wende eine torchaudio-Transformation an (z.B. Spektrogramm)
+    spectrogram_transform = torchaudio.transforms.Spectrogram().to(device)
+    spectrogram = spectrogram_transform(waveform)
+
+    logging.info("Torchaudio nutzt die GPU für Transformationen.")
+except Exception as e:
+    logging.error(f"Fehler bei der Verwendung von torchaudio: {str(e)}")
