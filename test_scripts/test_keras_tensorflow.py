@@ -22,6 +22,7 @@ logging.basicConfig(
 #################################
 import sys
 import cv2
+import keras  # Importiere keras direkt für die Versionsabfrage
 from ultralytics import YOLO
 from keras.models import load_model
 from keras.preprocessing import image
@@ -45,7 +46,7 @@ else:
 
 # Ausgabe von Versionen und Umgebungsvariablen
 logging.info(f"TensorFlow Version: {tf.__version__}")
-logging.info(f"Keras Version: {tf.keras.__version__}")
+logging.info(f"Keras Version: {keras.__version__}")  # Korrekt abgefragt über das direkte Importieren von keras
 logging.info(f"LD_LIBRARY_PATH: {os.environ.get('LD_LIBRARY_PATH')}")
 logging.info(f"CUDA Version: {tf.sysconfig.get_build_info().get('cuda_version', 'Unknown')}")
 logging.info(f"cuDNN Version: {tf.sysconfig.get_build_info().get('cudnn_version', 'Unknown')}")
