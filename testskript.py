@@ -43,6 +43,7 @@ try:
     logging.info(f"Finished pytorch/yolo test successfully")
 except subprocess.CalledProcessError as e:
     logging.error(f"Finished pytorch/yolo test with error {str(e)}")
+    exit(1)
 
 logging.info("############ TEST TENSORFLOW AND KERAS ############")
 command = [
@@ -54,6 +55,7 @@ try:
     logging.info(f"Finished tensorflow/keras test successfully")
 except subprocess.CalledProcessError as e:
     logging.error(f"Finished tensorflow/keras test with error {str(e)}")
+    exit(1)
 
 logging.info("############ TEST TORCHAUDIO ############")
 command = [
@@ -65,3 +67,4 @@ try:
     logging.info(f"Finished torchaudio test successfully")
 except subprocess.CalledProcessError as e:
     logging.error(f"Finished torchaudio test with error {str(e)}")
+    exit(1)

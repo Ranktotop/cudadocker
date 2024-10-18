@@ -1,7 +1,10 @@
+from ultralytics import YOLO
+import torch
+import logging
+
 #################################
 ####### register logging ########
 #################################
-import logging
 logging.basicConfig(
     level=logging.INFO,  # Legt die niedrigste Protokollierungsstufe fest
     format='%(asctime)s - %(levelname)s - %(message)s',  # Format der Log-Nachrichten
@@ -11,9 +14,6 @@ logging.basicConfig(
         logging.StreamHandler()  # Loggt Nachrichten in die Konsole
     ]
 )
-
-from ultralytics import YOLO
-import torch
 
 print("=== PyTorch und YOLO Test ===")
 # Überprüfe, ob CUDA verfügbar ist
@@ -29,4 +29,7 @@ yolo_results = yolo_model('https://ultralytics.com/images/zidane.jpg')
 
 # Ausgabe der verwendeten Hardware und Vorhersageergebnisse
 print("Verwendetes Gerät (YOLO):", yolo_model.device)
-yolo_results.show()  # Zeigt das Bild mit den Vorhersagen an
+
+# Zeige die Ergebnisse an
+for result in yolo_results:
+    result.show()  # Zeigt das Bild mit den Vorhersagen an
