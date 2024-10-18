@@ -10,7 +10,7 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s',  # Format der Log-Nachrichten
     datefmt='%d.%m.%Y %H:%M:%S',  # Format des Datums und der Uhrzeit
     handlers=[
-        logging.FileHandler("/gputest/logs/app.log"),  # Loggt Nachrichten in eine Datei
+        logging.FileHandler("/home/appuser/gputest/logs/app.log"),  # Loggt Nachrichten in eine Datei
         logging.StreamHandler()  # Loggt Nachrichten in die Konsole
     ]
 )
