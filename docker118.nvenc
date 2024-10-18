@@ -38,9 +38,6 @@ RUN git clone https://git.videolan.org/git/ffmpeg/nv-codec-headers.git /tmp/nv-c
     make install && \
     cd -
 
-# Setzen des LD_LIBRARY_PATH, um CUDA-Stubs einzuschließen
-ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64/stubs:$LD_LIBRARY_PATH
-
 # Erstellen von Symlinks für CUDA-Bibliotheken
 RUN ln -s /usr/local/cuda/lib64/stubs/libcuda.so /usr/lib/libcuda.so && \
     ln -s /usr/local/cuda/lib64/stubs/libnvcuvid.so /usr/lib/libnvcuvid.so && \

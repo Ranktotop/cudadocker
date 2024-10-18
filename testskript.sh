@@ -24,7 +24,7 @@ echo "CuDnn Version (cat /usr/include/cudnn_version.h | grep CUDNN_MAJOR -A 1):"
 cat /usr/include/cudnn_version.h | grep CUDNN_MAJOR -A 1
 echo "Content of ENV CUDA_HOME:"
 echo $CUDA_HOME
-echo "Content of ENVLD_LIBRARY_PATH:"
+echo "Content of ENV LD_LIBRARY_PATH:"
 echo $LD_LIBRARY_PATH
 echo "LibCudnn Files (ls /usr/local/cuda/lib64/libcudnn*):"
 ls /usr/local/cuda/lib64/libcudnn*
