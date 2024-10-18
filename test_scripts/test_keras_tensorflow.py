@@ -1,7 +1,11 @@
+import tensorflow as tf
+from keras.models import Sequential
+from keras.layers import Dense
+import logging
+
 #################################
 ####### register logging ########
 #################################
-import logging
 logging.basicConfig(
     level=logging.INFO,  # Legt die niedrigste Protokollierungsstufe fest
     format='%(asctime)s - %(levelname)s - %(message)s',  # Format der Log-Nachrichten
@@ -12,13 +16,19 @@ logging.basicConfig(
     ]
 )
 
-import tensorflow as tf
-from keras.models import Sequential
-from keras.layers import Dense
+# Begrenze den Speicherverbrauch der GPU durch TensorFlow
+gpus = tf.config.list_physical_devices('GPU')
+if gpus:
+    try:
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
+        print("Speicherwachstum für GPU aktiviert.")
+    except RuntimeError as e:
+        print("Fehler beim Setzen der Speicherwachstumsoption:", e)
 
 print("=== TensorFlow und Keras Test ===")
 # Überprüfe, ob eine GPU verfügbar ist und die CUDA- und cuDNN-Versionen
-print("CUDA verfügbar (TensorFlow):", len(tf.config.list_physical_devices('GPU')) > 0)
+print("CUDA verfügbar (TensorFlow):", len(gpus) > 0)
 print("CUDA Version (TensorFlow):", tf.sysconfig.get_build_info().get('cuda_version', 'Unknown'))
 print("cuDNN Version (TensorFlow):", tf.sysconfig.get_build_info().get('cudnn_version', 'Unknown'))
 
