@@ -1,14 +1,12 @@
-import tensorflow as tf
-from keras.models import load_model
-from keras.preprocessing import image
-import numpy as np
-import logging
-import os
-import cv2
-
 #################################
 ####### register logging ########
 #################################
+import logging
+import os
+
+# Setze den LD_LIBRARY_PATH vor allen anderen Imports
+os.environ['LD_LIBRARY_PATH'] = '/usr/local/cuda/lib64'
+
 logging.basicConfig(
     level=logging.INFO,  # Legt die niedrigste Protokollierungsstufe fest
     format='%(asctime)s - %(levelname)s - %(message)s',  # Format der Log-Nachrichten
@@ -18,6 +16,19 @@ logging.basicConfig(
         logging.StreamHandler()  # Loggt Nachrichten in die Konsole
     ]
 )
+
+#################################
+####### Importiere Module #######
+#################################
+import sys
+import cv2
+from ultralytics import YOLO
+from keras.models import load_model
+from keras.preprocessing import image
+import numpy as np
+from collections import defaultdict
+
+import tensorflow as tf
 
 # Begrenze den Speicherverbrauch der GPU durch TensorFlow
 gpus = tf.config.list_physical_devices('GPU')
@@ -29,65 +40,81 @@ if gpus:
         logging.info("Speicherwachstum für GPU aktiviert.")
     except RuntimeError as e:
         logging.error(f"Fehler beim Setzen der Speicherwachstumsoption: {str(e)}")
+else:
+    logging.error("Keine GPU verfügbar.")
 
-logging.info("=== TensorFlow und Keras Xception Modell Test ===")
-# Überprüfe, ob eine GPU verfügbar ist und die CUDA- und cuDNN-Versionen
-logging.info(f"CUDA verfügbar (TensorFlow): {len(gpus) > 0}")
-logging.info(f"CUDA Version (TensorFlow): {tf.sysconfig.get_build_info().get('cuda_version', 'Unknown')}")
-logging.info(f"cuDNN Version (TensorFlow): {tf.sysconfig.get_build_info().get('cudnn_version', 'Unknown')}")
+# Ausgabe von Versionen und Umgebungsvariablen
+logging.info(f"TensorFlow Version: {tf.__version__}")
+logging.info(f"Keras Version: {tf.keras.__version__}")
+logging.info(f"LD_LIBRARY_PATH: {os.environ.get('LD_LIBRARY_PATH')}")
+logging.info(f"CUDA Version: {tf.sysconfig.get_build_info().get('cuda_version', 'Unknown')}")
+logging.info(f"cuDNN Version: {tf.sysconfig.get_build_info().get('cudnn_version', 'Unknown')}")
 
-# Lade das gleiche Keras-Modell wie im Produktionsskript
+#################################
+##### Lade Modelle ##############
+#################################
 try:
-    # Ersetze 'path_to_model.hdf5' durch den tatsächlichen Pfad zu deinem Modell
-    model_path = '/home/appuser/gputest/test_scripts/_mini_XCEPTION.102-0.66.hdf5'  # Pfad zum Xception-Modell
-    keras_model = load_model(model_path, compile=False)
-    logging.info("Keras-Modell erfolgreich geladen.")
+    # Pfade zu den Modellen anpassen
+    yolo_model_path = '/home/appuser/gputest/test_scripts/yolov8x-face-lindevs.pt'
+    xception_model_path = '/home/appuser/gputest/test_scripts/_mini_XCEPTION.102-0.66.hdf5'
+
+    # Lade YOLO-Modell
+    yolo_model = YOLO(yolo_model_path)
+    logging.info("YOLO-Modell erfolgreich geladen.")
+
+    # Lade Xception-Modell
+    keras_model = load_model(xception_model_path, compile=False)
+    logging.info("Xception-Modell erfolgreich geladen.")
 except Exception as e:
-    logging.error(f"Fehler beim Laden des Keras-Modells: {str(e)}")
+    logging.error(f"Fehler beim Laden der Modelle: {str(e)}")
     exit(1)
 
-# Erstelle oder lade ein Beispielbild
+#################################
+##### Prozess simulieren ########
+#################################
 try:
-    # Beispielbild laden oder erstellen
-    # Um den Prozess genau zu spiegeln, könntest du ein echtes Bild verwenden
-    # Beispiel: img = cv2.imread('path_to_image.jpg')
-
-    # Für diesen Test verwenden wir ein zufälliges Gesicht
-    img = cv2.imread('/home/appuser/gputest/test_scripts/testimage.jpg')  # Ersetze durch einen tatsächlichen Pfad
-
+    # Lade ein Beispielbild
+    img = cv2.imread('/home/appuser/gputest/test_scripts/testimage.jpg')  # Pfad anpassen
     if img is None:
         logging.error("Bild konnte nicht geladen werden.")
         exit(1)
 
-    # Simuliere das gleiche Vorverarbeitungsverfahren wie im Produktionsskript
-    # 1. Extrahiere das Gesicht aus dem Bild (hier das gesamte Bild oder einen Ausschnitt)
-    # Hier kannst du die gleichen Koordinaten verwenden, falls vorhanden, oder das gesamte Bild nehmen
-    face = img  # In diesem Test verwenden wir das gesamte Bild als "Gesicht"
+    # Führe YOLO-Vorhersage durch
+    results = yolo_model.predict(img, conf=0.5)
 
-    # 2. Konvertiere zu Graustufen
-    face = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
+    emotions = ["angry", "disgust", "scared", "happy", "sad", "surprised", "neutral"]
+    emotion_data = []
 
-    # 3. Skaliere auf 64x64
-    face = cv2.resize(face, (64, 64))
+    for result in results:
+        for box in result.boxes:
+            # Extrahiere das Gesicht aus dem Bild
+            x1, y1, x2, y2 = int(box.xyxy[0][0]), int(box.xyxy[0][1]), int(box.xyxy[0][2]), int(box.xyxy[0][3])
+            face = img[y1:y2, x1:x2]
+            face = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
+            face = cv2.resize(face, (64, 64))
+            face = image.img_to_array(face)
+            face = np.expand_dims(face, axis=0)
+            face /= 255
 
-    # 4. Konvertiere zu einem Array
-    face = image.img_to_array(face)
+            # Führe Emotionserkennung durch
+            preds = keras_model.predict(face)
+            emotion_score = np.max(preds)
+            emotion_label = emotions[preds.argmax()]
 
-    # 5. Erweitere die Dimensionen
-    face = np.expand_dims(face, axis=0)
+            # Speichere Emotionsdaten
+            emotion_data.append((emotion_label, emotion_score, (x1, y1, x2, y2)))
 
-    # 6. Normalisiere die Pixelwerte
-    face /= 255
+            # Optional: Zeichne Rahmen und Text auf das Bild
+            cv2.rectangle(img, (x1, y1), (x2, y2), (255, 0, 0), 2)
+            text = f"{emotion_label} ({emotion_score:.2f})"
+            cv2.putText(img, text, (x1, y1 - 10),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
 
-    logging.info("Bild erfolgreich vorverarbeitet.")
+    logging.info(f"Emotionserkennung erfolgreich: {emotion_data}")
 
+    # Optional: Zeige das Bild an
+    # cv2.imshow("Ergebnisse", img)
+    # cv2.waitKey(0)
 except Exception as e:
-    logging.error(f"Fehler bei der Bildvorverarbeitung: {str(e)}")
+    logging.error(f"Fehler bei der Emotionserkennung: {str(e)}")
     exit(1)
-
-# Führe die Vorhersage aus
-try:
-    preds = keras_model.predict(face)
-    logging.info(f"Vorhersage erfolgreich: {preds}")
-except Exception as e:
-    logging.error(f"Fehler bei der Vorhersage mit dem Keras-Modell: {str(e)}")
