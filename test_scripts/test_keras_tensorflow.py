@@ -35,7 +35,7 @@ import tensorflow as tf
 ##### Lade Modelle ##############
 #################################
 try:
-    yolo_model_path = '/home/appuser/gputest/test_scripts/yolov8n-face-lindevs.pt'
+    yolo_model_path = '/home/appuser/gputest/test_scripts/yolov8x-face-lindevs.pt'
     xception_model_path = '/home/appuser/gputest/test_scripts/_mini_XCEPTION.102-0.66.hdf5'
 
     # Lade YOLO-Modell
