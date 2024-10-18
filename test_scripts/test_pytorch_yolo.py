@@ -25,7 +25,7 @@ logging.info(f"cuDNN Version (PyTorch): {torch.backends.cudnn.version()}")
 yolo_model = YOLO('yolov8n.pt')
 
 # Führe eine Vorhersage auf einem Beispielbild durch
-yolo_results = yolo_model('https://ultralytics.com/images/zidane.jpg')
+yolo_results = yolo_model('/home/appuser/gputest/test_scripts/testimage.jpg')
 
 # Ausgabe der verwendeten Hardware und Vorhersageergebnisse
 logging.info(f"Verwendetes Gerät (YOLO): {yolo_model.device}")
