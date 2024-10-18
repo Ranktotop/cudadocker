@@ -22,16 +22,23 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 logging.info(f"CUDA verfügbar: {torch.cuda.is_available()}")
 logging.info(f"Verwendetes Gerät: {device}")
 
+# Generiere ein zufälliges Audiosignal (Wellenform)
+sample_rate = 16000
+duration = 1  # in Sekunden
 try:
-    # Generiere ein zufälliges Audiosignal (Wellenform)
-    sample_rate = 16000
-    duration = 1  # in Sekunden
+    logging.info("Erstelle zufällige Wellenform...")
     waveform = torch.randn(1, sample_rate * duration).to(device)
+    logging.info("Wellenform erstellt.")
 
-    # Wende eine torchaudio-Transformation an (z.B. Spektrogramm)
+    logging.info("Erstelle Spektrogramm-Transformation...")
     spectrogram_transform = torchaudio.transforms.Spectrogram().to(device)
+    logging.info("Transformation erstellt.")
+
+    logging.info("Wende Transformation an...")
     spectrogram = spectrogram_transform(waveform)
+    logging.info("Transformation angewendet.")
 
     logging.info("Torchaudio nutzt die GPU für Transformationen.")
 except Exception as e:
     logging.error(f"Fehler bei der Verwendung von torchaudio: {str(e)}")
+
