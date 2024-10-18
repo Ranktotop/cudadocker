@@ -12,7 +12,7 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s',  # Format der Log-Nachrichten
     datefmt='%d.%m.%Y %H:%M:%S',  # Format des Datums und der Uhrzeit
     handlers=[
-        logging.FileHandler("/gputest/logs/app.log"),  # Loggt Nachrichten in eine Datei
+        logging.FileHandler("/home/appuser/gputest/logs/app.log"),  # Loggt Nachrichten in eine Datei
         logging.StreamHandler()  # Loggt Nachrichten in die Konsole
     ]
 )
@@ -26,13 +26,13 @@ if gpus:
             tf.config.experimental.set_memory_growth(gpu, True)
         logging.info("Speicherwachstum für GPU aktiviert.")
     except RuntimeError as e:
-        logging.error("Fehler beim Setzen der Speicherwachstumsoption:", e)
+        logging.error(f"Fehler beim Setzen der Speicherwachstumsoption: {str(e)}")
 
 logging.info("=== TensorFlow und Keras Convolutional Layer Test ===")
 # Überprüfe, ob eine GPU verfügbar ist und die CUDA- und cuDNN-Versionen
-logging.info("CUDA verfügbar (TensorFlow):", len(gpus) > 0)
-logging.info("CUDA Version (TensorFlow):", tf.sysconfig.get_build_info().get('cuda_version', 'Unknown'))
-logging.info("cuDNN Version (TensorFlow):", tf.sysconfig.get_build_info().get('cudnn_version', 'Unknown'))
+logging.info(f"CUDA verfügbar (TensorFlow): {len(gpus) > 0}")
+logging.info(f"CUDA Version (TensorFlow): {tf.sysconfig.get_build_info().get('cuda_version', 'Unknown')}")
+logging.info(f"cuDNN Version (TensorFlow): {tf.sysconfig.get_build_info().get('cudnn_version', 'Unknown')}")
 
 # Erstelle ein einfaches Keras-Modell mit Convolutional Layers zum Testen der GPU-Nutzung
 logging.info("\nErstelle und teste ein Keras-Modell mit Convolutional Layers:")
@@ -57,6 +57,6 @@ try:
         preds = keras_model.predict(dummy_input)
     logging.info("Keras nutzt die GPU für Convolutional Layers.")
 except RuntimeError as e:
-    logging.error("Keras konnte nicht auf die GPU zugreifen:", e)
+    logging.error(f"Keras konnte nicht auf die GPU zugreifen: {str(e)}")
 except Exception as e:
-    logging.error("Ein Fehler ist aufgetreten:", e)
+    logging.error(f"Ein Fehler ist aufgetreten:: {str(e)}")

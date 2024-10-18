@@ -17,9 +17,9 @@ import torch
 
 logging.info("=== Torchaudio Test ===")
 # Überprüfe, ob CUDA verfügbar ist
-logging.info("CUDA verfügbar (Torchaudio):", torch.cuda.is_available())
-logging.info("CUDA Version (Torchaudio):", torch.version.cuda)
-logging.info("cuDNN Version (Torchaudio):", torch.backends.cudnn.version())
+logging.info(f"CUDA verfügbar (Torchaudio): {torch.cuda.is_available()}")
+logging.info(f"CUDA Version (Torchaudio): {torch.version.cuda}")
+logging.info(f"cuDNN Version (Torchaudio): {torch.backends.cudnn.version()}")
 
 # Teste, ob ein einfacher Audio-Tensor auf die GPU geladen werden kann
 try:
@@ -27,4 +27,4 @@ try:
     audio_tensor = audio_tensor.to('cuda' if torch.cuda.is_available() else 'cpu')
     logging.info("Torchaudio nutzt die GPU.")
 except RuntimeError as e:
-    logging.error("Torchaudio konnte nicht auf die GPU zugreifen:", e)
+    logging.error(f"Torchaudio konnte nicht auf die GPU zugreifen: {str(e)}")

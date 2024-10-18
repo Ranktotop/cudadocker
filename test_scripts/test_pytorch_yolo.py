@@ -17,9 +17,9 @@ logging.basicConfig(
 
 logging.info("=== PyTorch und YOLO Test ===")
 # Überprüfe, ob CUDA verfügbar ist
-logging.info("CUDA verfügbar (PyTorch):", torch.cuda.is_available())
-logging.info("CUDA Version (PyTorch):", torch.version.cuda)
-logging.info("cuDNN Version (PyTorch):", torch.backends.cudnn.version())
+logging.info(f"CUDA verfügbar (PyTorch): {torch.cuda.is_available()}")
+logging.info(f"CUDA Version (PyTorch): {torch.version.cuda}")
+logging.info(f"cuDNN Version (PyTorch): {torch.backends.cudnn.version()}")
 
 # Lade das YOLO-Modell
 yolo_model = YOLO('yolov8n.pt')
@@ -28,7 +28,7 @@ yolo_model = YOLO('yolov8n.pt')
 yolo_results = yolo_model('https://ultralytics.com/images/zidane.jpg')
 
 # Ausgabe der verwendeten Hardware und Vorhersageergebnisse
-logging.info("Verwendetes Gerät (YOLO):", yolo_model.device)
+logging.info(f"Verwendetes Gerät (YOLO): {yolo_model.device}")
 
 # Zeige die Ergebnisse an
 for result in yolo_results:
