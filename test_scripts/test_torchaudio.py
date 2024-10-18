@@ -2,13 +2,16 @@ import logging
 import torch
 import torchaudio
 
+#################################
+####### register logging ########
+#################################
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    datefmt='%d.%m.%Y %H:%M:%S',
+    level=logging.INFO,  # Legt die niedrigste Protokollierungsstufe fest
+    format='%(asctime)s - %(levelname)s - %(message)s',  # Format der Log-Nachrichten
+    datefmt='%d.%m.%Y %H:%M:%S',  # Format des Datums und der Uhrzeit
     handlers=[
-        logging.FileHandler("/home/appuser/gputest/logs/app.log"),
-        logging.StreamHandler()
+        logging.FileHandler("/home/appuser/gputest/logs/app.log"),  # Loggt Nachrichten in eine Datei
+        logging.StreamHandler()  # Loggt Nachrichten in die Konsole
     ]
 )
 
