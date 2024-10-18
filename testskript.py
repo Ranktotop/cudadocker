@@ -7,7 +7,7 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s',  # Format der Log-Nachrichten
     datefmt='%d.%m.%Y %H:%M:%S',  # Format des Datums und der Uhrzeit
     handlers=[
-        logging.FileHandler("/gputest/logs/app.log"),  # Loggt Nachrichten in eine Datei
+        logging.FileHandler("/home/appuser/gputest/logs/app.log"),  # Loggt Nachrichten in eine Datei
         logging.StreamHandler()  # Loggt Nachrichten in die Konsole
     ]
 )
@@ -35,8 +35,8 @@ logging.info(f"  TensorFlow: {tf.config.list_physical_devices('GPU')[0].name if 
 
 logging.info("############ TEST PYTORCH AND YOLO ############")
 command = [
-        "/gputest/.venv/bin/python", 
-        "/gputest/test_scripts/test_pytorch_yolo.py"
+        "/home/appuser/gputest/.venv/bin/python", 
+        "/home/appuser/gputest/test_scripts/test_pytorch_yolo.py"
     ]
 try:
     subprocess.run(command, check=True)
@@ -47,8 +47,8 @@ except subprocess.CalledProcessError as e:
 
 logging.info("############ TEST TENSORFLOW AND KERAS ############")
 command = [
-        "/gputest/.venv/bin/python", 
-        "/gputest/test_scripts/test_keras_tensorflow.py"
+        "/home/appuser/gputest/.venv/bin/python", 
+        "/home/appuser/gputest/test_scripts/test_keras_tensorflow.py"
     ]
 try:
     subprocess.run(command, check=True)
@@ -59,8 +59,8 @@ except subprocess.CalledProcessError as e:
 
 logging.info("############ TEST TORCHAUDIO ############")
 command = [
-        "/gputest/.venv/bin/python", 
-        "/gputest/test_scripts/test_torchaudio.py"
+        "/home/appuser/gputest/.venv/bin/python", 
+        "/home/appuser/gputest/test_scripts/test_torchaudio.py"
     ]
 try:
     subprocess.run(command, check=True)

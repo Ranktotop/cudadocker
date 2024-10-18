@@ -5,8 +5,8 @@ apt-get update
 apt-get install -y python3.10-venv
 
 echo "Installing pip dependencies..."
-python3 -m venv /gputest/.venv \
-    && . /gputest/.venv/bin/activate \
+python3 -m venv /home/appuser/gputest/.venv \
+    && . /home/appuser/gputest/.venv/bin/activate \
     && pip3 install pytz \
     && pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118 \
     && pip3 install tensorflow==2.14.0 \
@@ -32,4 +32,4 @@ echo "Other Cuda-related infos (env | grep CU | sort):"
 env | grep CU | sort
 
 echo "Starting python tests..."
-/gputest/.venv/bin/python -u /gputest/testskript.py 2>&1 | tee -a /gputest/logs/app.log
+/home/appuser/gputest/.venv/bin/python -u /home/appuser/gputest/testskript.py 2>&1 | tee -a /home/appuser/gputest/logs/app.log
