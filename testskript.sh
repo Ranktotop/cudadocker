@@ -32,4 +32,4 @@ echo "Other Cuda-related infos (env | grep CU | sort):"
 env | grep CU | sort
 
 echo "Starting python tests..."
-python3 -u /gputest/testskript.py 2>&1 | tee -a /gputest/logs/app.log
+/gputest/.venv/bin/python -u /gputest/testskript.py 2>&1 | tee -a /gputest/logs/app.log
