@@ -4,9 +4,9 @@ set -e  # End script on error
 apt-get update
 apt-get install -y python3.10-venv
 
-echo "Installing visual dependencies..."
+echo "Installing pip dependencies..."
 python3 -m venv /gputest/.venv \
-    && . /gputest/.venv/activate \
+    && . /gputest/.venv/bin/activate \
     && pip3 install pytz \
     && pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118 \
     && pip3 install tensorflow==2.14.0 \
