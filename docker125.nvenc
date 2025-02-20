@@ -27,16 +27,8 @@ RUN apt-get update && apt-get install -y \
 ########### INSTALL NVENC #############
 #######################################
 
-# Installiere das CUDA-Toolkit 12.5, um sicherzustellen, dass alle CUDA-Tools verfügbar sind
 RUN apt-get update && \
-    apt-get install -y --allow-downgrades \
-    cuda-libraries-12-5=12.5.3.2-1 \
-    cuda-libraries-dev-12-5=12.5.3.2-1 && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-RUN apt-get update && \
-    cuda-toolkit-12-5 && \
+    cuda-toolkit-12-5-12.5.0 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
