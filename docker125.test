@@ -15,5 +15,9 @@ COPY testskript125.sh /home/appuser/gputest/testskript.sh
 COPY testskript125.py /home/appuser/gputest/testskript.py
 RUN chmod +x /home/appuser/gputest/testskript.sh
 
+#crate logs folder
+RUN mkdir /home/appuser/gputest/logs
+RUN touch /home/appuser/gputest/logs/app.log
+
 # Keep the container running
 CMD ["sleep", "infinity"]
