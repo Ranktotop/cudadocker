@@ -63,7 +63,7 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     libnvinfer10=10.3.0.26-1+cuda12.5 \
     libnvinfer-dev=10.3.0.26-1+cuda12.5 \
-    libnvinfer-plugin8=10.3.0.26-1+cuda12.5 \
+    libnvinfer-plugin10=10.3.0.26-1+cuda12.5 \
     libnvinfer-bin=10.3.0.26-1+cuda12.5 \
     libnvonnxparsers10=10.3.0.26-1+cuda12.5 \
     libnvonnxparsers-dev=10.3.0.26-1+cuda12.5 && \
