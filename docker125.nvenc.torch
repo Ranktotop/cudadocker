@@ -6,7 +6,7 @@ FROM ranktotop/cudadocker:125_nvenc AS base
 RUN pip3 install --no-cache-dir torch \
     torchvision \
     torchaudio \
-    "torch-audiomentations==0.11.2" \
-    "torch_pitch_shift==1.2.5" \
-    "torchmetrics==1.6.1"
+    torch-audiomentations \
+    torch_pitch_shift \
+    torchmetrics
     
