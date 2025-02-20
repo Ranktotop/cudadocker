@@ -41,6 +41,4 @@ RUN git clone https://git.videolan.org/git/ffmpeg/nv-codec-headers.git /tmp/nv-c
     cd -
 
 # Erstellen von Symlinks für CUDA-Bibliotheken
-RUN ln -s /usr/local/cuda/lib64/stubs/libcuda.so /usr/lib/libcuda.so && \
-    ln -s /usr/local/cuda/lib64/stubs/libnvcuvid.so /usr/lib/libnvcuvid.so && \
-    ln -s /usr/local/cuda/lib64/stubs/libnvidia-encode.so /usr/lib/libnvidia-encode.so
+RUN ln -s /usr/local/cuda/lib64/stubs/libcuda.so /usr/lib/libcuda.so
