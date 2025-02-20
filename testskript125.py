@@ -32,39 +32,3 @@ logging.info(f"  TensorFlow: {len(tf.config.list_physical_devices('GPU'))}")
 logging.info('\nName der verwendeten GPU:')
 logging.info(f"  PyTorch: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'Keine GPU gefunden'}")
 logging.info(f"  TensorFlow: {tf.config.list_physical_devices('GPU')[0].name if len(tf.config.list_physical_devices('GPU')) > 0 else 'Keine GPU gefunden'}")
-
-logging.info("############ TEST PYTORCH AND YOLO ############")
-command = [
-        "/home/appuser/gputest/.venv/bin/python", 
-        "/home/appuser/gputest/test_scripts/test_pytorch_yolo.py"
-    ]
-try:
-    subprocess.run(command, check=True)
-    logging.info(f"Finished pytorch/yolo test successfully")
-except subprocess.CalledProcessError as e:
-    logging.error(f"Finished pytorch/yolo test with error {str(e)}")
-    exit(1)
-
-logging.info("############ TEST TENSORFLOW AND KERAS ############")
-command = [
-        "/home/appuser/gputest/.venv/bin/python", 
-        "/home/appuser/gputest/test_scripts/test_keras_tensorflow.py"
-    ]
-try:
-    subprocess.run(command, check=True)
-    logging.info(f"Finished tensorflow/keras test successfully")
-except subprocess.CalledProcessError as e:
-    logging.error(f"Finished tensorflow/keras test with error {str(e)}")
-    exit(1)
-
-logging.info("############ TEST TORCHAUDIO ############")
-command = [
-        "/home/appuser/gputest/.venv/bin/python", 
-        "/home/appuser/gputest/test_scripts/test_torchaudio.py"
-    ]
-try:
-    subprocess.run(command, check=True)
-    logging.info(f"Finished torchaudio test successfully")
-except subprocess.CalledProcessError as e:
-    logging.error(f"Finished torchaudio test with error {str(e)}")
-    exit(1)
