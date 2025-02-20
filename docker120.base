@@ -1,4 +1,4 @@
-FROM nvidia/cuda:12.8.0-cudnn-devel-ubuntu22.04 
+FROM nvidia/cuda:12.0.0-cudnn-devel-ubuntu22.04 
 #contains cudnn 9.7
 
 # Tell the CUDA environment what GPU features to expose in the container.
@@ -48,13 +48,13 @@ RUN apt-get update && apt-get install -y \
 #check available versions here: https://developer.download.nvidia.com/compute/cuda/repos/rhel8/x86_64/
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    libnvinfer10=10.8.0.43-1+cuda12.8 \
-    libnvinfer-dev=10.8.0.43-1+cuda12.8 \
-    libnvinfer-plugin10=10.8.0.43-1+cuda12.8 \
-    libnvinfer-bin=10.8.0.43-1+cuda12.8 \
+    libnvinfer8=8.6.1.6-1+cuda12.0 \
+    libnvinfer-dev=8.6.1.6-1+cuda12.0 \
+    libnvinfer-plugin8=8.6.1.6-1+cuda12.0 \
+    libnvinfer-bin=8.6.1.6-1+cuda12.0 \
     libnvparsers8=8.6.1.6-1+cuda12.0 \
     libnvparsers-dev=8.6.1.6-1+cuda12.0 \
-    libnvonnxparsers10=10.8.0.43-1+cuda12.8 \
-    libnvonnxparsers-dev=10.8.0.43-1+cuda12.8 && \
+    libnvonnxparsers8=8.6.1.6-1+cuda12.0 \
+    libnvonnxparsers-dev=8.6.1.6-1+cuda12.0 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
