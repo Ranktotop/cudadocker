@@ -11,9 +11,9 @@ RUN apt-get update \
 ######################################
 ########### COPY SCRIPTS #############
 ######################################
-COPY testskript125.sh /home/appuser/testskript.sh
-COPY testskript125.py /home/appuser/testskript.py
-RUN chmod +x /home/appuser/testskript.sh
+COPY testskript125.sh /home/appuser/gputest/testskript.sh
+COPY testskript125.py /home/appuser/gputest/testskript.py
+RUN chmod +x /home/appuser/gputest/testskript.sh
 
 # Keep the container running
 CMD ["sleep", "infinity"]
