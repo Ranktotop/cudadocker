@@ -28,7 +28,7 @@ RUN apt-get update && apt-get install -y \
 #######################################
 
 RUN apt-get update && \
-    cuda-toolkit-12-5=12.5.0-1 && \
+    apt-get install -y --allow-downgrades "cuda-toolkit-12-5=12.5.0-1" && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
