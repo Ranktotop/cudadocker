@@ -1,0 +1,8 @@
+FROM ranktotop/cudadocker:125_nvenc
+
+COPY testskript125.sh /home/appuser/testskript.sh
+COPY testskript125.py /home/appuser/testskript.py
+RUN chmod +x /home/appuser/testskript.sh
+
+# Keep the container running
+CMD ["sleep", "infinity"]
