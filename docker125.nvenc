@@ -30,9 +30,13 @@ RUN apt-get update && apt-get install -y \
 # Installiere das CUDA-Toolkit 12.5, um sicherzustellen, dass alle CUDA-Tools verfügbar sind
 RUN apt-get update && \
     apt-get install -y --allow-downgrades \
-      libcublas-12-5=12.5.3.2-1 \
-      libcublas-dev-12-5=12.5.3.2-1 \
-      cuda-toolkit-12-5 && \
+    libcublas-12-5=12.5.3.2-1 \
+    libcublas-dev-12-5=12.5.3.2-1 && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update && \
+    cuda-toolkit-12-5 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
