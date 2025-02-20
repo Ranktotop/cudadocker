@@ -6,6 +6,12 @@ ENV NVIDIA_DRIVER_CAPABILITIES=all
 #ENV CUDA_VISIBLE_DEVICES=0
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Upgrade libcublas
+RUN apt-get update && \
+    apt-get install -y --allow-change-held-packages "libcublas-12-5=12.5.3.2-1" "libcublas-dev-12-5=12.5.3.2-1" && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     gstreamer1.0-alsa \
