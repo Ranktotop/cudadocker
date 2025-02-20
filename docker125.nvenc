@@ -28,7 +28,7 @@ RUN apt-get update && apt-get install -y \
 #######################################
 
 RUN apt-get update && \
-    apt-get install -y "libcublas-12-5=12.5.3.2-1" && \
+    apt-get install -y --allow-change-held-packages "libcublas-12-5=12.5.3.2-1" && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
