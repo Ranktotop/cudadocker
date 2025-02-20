@@ -61,7 +61,7 @@ RUN wget https://developer.download.nvidia.com/compute/cudnn/9.3.0/local_install
 #check support matrix here: https://www.tensorflow.org/install/source#gpu
 
 RUN apt-get update && \
-    apt-get install -y --allow-downgrades --no-install-recommends \
+    apt-get install -y --allow-downgrades \
     libnvinfer-lean10=10.3.0.26-1+cuda12.5 \
     libnvinfer-vc-plugin10=10.3.0.26-1+cuda12.5 \
     libnvinfer-dispatch10=10.3.0.26-1+cuda12.5 \
@@ -70,7 +70,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN apt-get update && \
-    apt-get install -y --allow-downgrades --no-install-recommends \
+    apt-get install -y --allow-downgrades \
     libnvinfer10=10.3.0.26-1+cuda12.5 \
     libnvinfer-dev=10.3.0.26-1+cuda12.5 \
     libnvinfer-plugin10=10.3.0.26-1+cuda12.5 \
