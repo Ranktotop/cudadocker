@@ -80,6 +80,7 @@ ENV CUDA_HOME=/usr/local/cuda
 ######### INSTALL TENSORRT ############
 #######################################
 
+#check available versions here: https://developer.download.nvidia.com/compute/cuda/repos/rhel8/x86_64/
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     libnvinfer8=8.5.1-1+cuda11.8 \

@@ -45,14 +45,15 @@ RUN apt-get update && apt-get install -y \
 ######### INSTALL TENSORRT ############
 #######################################
 
+#check available versions here: https://developer.download.nvidia.com/compute/cuda/repos/rhel8/x86_64/
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     libnvinfer10=10.8.0.43-1+cuda12.8 \
     libnvinfer-dev=10.8.0.43-1+cuda12.8 \
     libnvinfer-plugin10=10.8.0.43-1+cuda12.8 \
-    libnvparsers10=10.8.0.43-1+cuda12.8 \
-    libnvparsers-dev=10.8.0.43-1+cuda12.8 \
     libnvinfer-bin=10.8.0.43-1+cuda12.8 \
+    libnvparsers8=8.6.1.6-1+cuda12.0 \
+    libnvparsers-dev=8.6.1.6-1+cuda12.0 \
     libnvonnxparsers10=10.8.0.43-1+cuda12.8 \
     libnvonnxparsers-dev=10.8.0.43-1+cuda12.8 && \
     apt-get clean && \
