@@ -53,7 +53,7 @@ RUN apt-get update && apt-get remove -y --allow-change-held-packages libcudnn8 l
 #    dpkg -i cuda-keyring_1.1-1_all.deb && \
 #    apt-get update
 
-# Install cuDNN 8.7 for getting compatibility with tensorflow 2.14
+# Install cuDNN 8.7 for getting compatibility with tensorflow 2.14 -> https://www.tensorflow.org/install/source#gpu
 #RUN apt-get install -y libcudnn8=8.7.0.*-1+cuda11.8 libcudnn8-dev=8.7.0.*-1+cuda11.8
 
 # Install cuDNN 8.7 for getting compatibility with tensorflow 2.14

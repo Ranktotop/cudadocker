@@ -1,5 +1,4 @@
-FROM nvidia/cuda:12.0.0-cudnn8-devel-ubuntu22.04 
-#contains cudnn 8.8.0.121
+FROM nvidia/cuda:12.5.0-devel-ubuntu22.04
 
 # Tell the CUDA environment what GPU features to expose in the container.
 ENV NVIDIA_DRIVER_CAPABILITIES=all
@@ -32,6 +31,7 @@ RUN apt-get update && apt-get install -y \
     libxcb-cursor0 \
     python3-pip \
     wget \
+    ca-certificates \
     curl \
     git \
     nano \
@@ -42,19 +42,30 @@ RUN apt-get update && apt-get install -y \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 #######################################
+######### INSTALL cuDNN 9.3 ###########
+#######################################
+
+# cuDNN-Local-Repo herunterladen, installieren und konfigurieren
+RUN wget https://developer.download.nvidia.com/compute/cudnn/9.3.0/local_installers/cudnn-local-repo-ubuntu2204-9.3.0_1.0-1_amd64.deb && \
+    dpkg -i cudnn-local-repo-ubuntu2204-9.3.0_1.0-1_amd64.deb && \
+    cp /var/cudnn-local-repo-ubuntu2204-9.3.0/cudnn-*-keyring.gpg /usr/share/keyrings/ && \
+    apt-get update && \
+    apt-get -y install cudnn-cuda-12 && \
+    rm cudnn-local-repo-ubuntu2204-9.3.0_1.0-1_amd64.deb
+
+#######################################
 ######### INSTALL TENSORRT ############
 #######################################
 
 #check available versions here: https://developer.download.nvidia.com/compute/cuda/repos/rhel8/x86_64/
+#check support matrix here: https://www.tensorflow.org/install/source#gpu
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    libnvinfer8=8.6.1.6-1+cuda12.0 \
-    libnvinfer-dev=8.6.1.6-1+cuda12.0 \
-    libnvinfer-plugin8=8.6.1.6-1+cuda12.0 \
-    libnvinfer-bin=8.6.1.6-1+cuda12.0 \
-    libnvparsers8=8.6.1.6-1+cuda12.0 \
-    libnvparsers-dev=8.6.1.6-1+cuda12.0 \
-    libnvonnxparsers8=8.6.1.6-1+cuda12.0 \
-    libnvonnxparsers-dev=8.6.1.6-1+cuda12.0 && \
+    libnvinfer10=10.3.0.26-1+cuda12.5 \
+    libnvinfer-dev=10.3.0.26-1+cuda12.5 \
+    libnvinfer-plugin8=10.3.0.26-1+cuda12.5 \
+    libnvinfer-bin=10.3.0.26-1+cuda12.5 \
+    libnvonnxparsers10=10.3.0.26-1+cuda12.5 \
+    libnvonnxparsers-dev=10.3.0.26-1+cuda12.5 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
