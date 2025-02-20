@@ -1,4 +1,4 @@
-FROM nvidia/cuda:12.0.0-cudnn-devel-ubuntu22.04 
+FROM nvidia/cuda:12.0.0-cudnn8-devel-ubuntu22.04 
 #contains cudnn 9.7
 
 # Tell the CUDA environment what GPU features to expose in the container.
