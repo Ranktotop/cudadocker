@@ -27,6 +27,7 @@ RUN apt-get update && apt-get install -y \
 ########### INSTALL NVENC #############
 #######################################
 
+# Install cuda toolkit for cuda 12.5
 RUN apt-get update && \
     apt-get install -y "cuda-toolkit-12-5=12.5.0-1" && \
     apt-get clean && \
