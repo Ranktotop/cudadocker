@@ -1,4 +1,4 @@
-FROM ranktotop/cudadocker:125_nvenc AS base
+FROM ranktotop/cudadocker:125_nvenc_cudnn8 AS base
     
 ######################################
 ###### INSTALL PYTHON PACKAGES #######
