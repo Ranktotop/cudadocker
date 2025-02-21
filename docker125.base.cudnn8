@@ -76,6 +76,12 @@ ENV CUDA_HOME=/usr/local/cuda
 
 #check available versions here: https://developer.download.nvidia.com/compute/cuda/repos/rhel8/x86_64/
 RUN apt-get update && \
+    apt-get install -y --allow-downgrades \
+    libnvinfer-headers-dev=8.6.1.6-1+cuda12.0 && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     libnvinfer8=8.6.1.6-1+cuda12.0 \
     libnvinfer-dev=8.6.1.6-1+cuda12.0 \
