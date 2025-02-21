@@ -54,7 +54,7 @@ RUN apt-get update && apt-get install -y \
 # cuDNN-Local-Repo herunterladen, installieren und konfigurieren
 RUN wget https://marcmeese.s3.eu-central-1.amazonaws.com/packages/nvidia/cudnn-local-repo-ubuntu2204-8.9.7.29_1.0-1_amd64.deb && \
     dpkg -i cudnn-local-repo-ubuntu2204-8.9.7.29_1.0-1_amd64.deb && \
-    cp /var/cudnn-local-repo-ubuntu2204-8.9.7/cudnn-*-keyring.gpg /usr/share/keyrings/ && \
+    cp /var/cudnn-local-repo-ubuntu2204-8.9.7.29/cudnn-local-08A7D361-keyring.gpg /usr/share/keyrings/ && \
     apt-get update && \
     apt-get -y install cudnn-cuda-12 && \
     rm cudnn-local-repo-ubuntu2204-8.9.7.29_1.0-1_amd64.deb
