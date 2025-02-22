@@ -71,6 +71,12 @@ ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64
 ENV CUDA_HOME=/usr/local/cuda
 
 #######################################
+###### BACKWARDS COMPATIBILITY ########
+#######################################
+#since libcuda does not exist in cuda >12, we create a symlink here (e.g needed for cmake)
+RUN ln -s /usr/local/cuda/lib64/stubs/libcuda.so /usr/local/cuda/lib64/libcuda.so.1
+
+#######################################
 ######### INSTALL TENSORRT ############
 #######################################
 
