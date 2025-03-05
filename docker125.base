@@ -69,6 +69,7 @@ RUN ln -s /usr/lib/x86_64-linux-gnu/libcudnn.so.9 /usr/local/cuda/lib64/libcudnn
 #replace the wrong nvidia path with correct one
 ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64
 ENV CUDA_HOME=/usr/local/cuda
+ENV FORCE_CUDA=1
 
 #######################################
 ######### INSTALL TENSORRT ############
