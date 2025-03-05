@@ -1,0 +1,14 @@
+FROM ranktotop/cudadocker:118_nvenc AS base
+    
+######################################
+###### INSTALL PYTHON PACKAGES #######
+######################################
+#check compatible versions here -> https://pytorch.org/get-started/locally/
+RUN pip3 install --no-cache-dir --extra-index-url https://download.pytorch.org/whl/cu118 \
+    "torch==2.0.1" \
+    "torchvision==0.15.2" \
+    "torchaudio==2.0.1" \
+    "torch-audiomentations==0.11.2" \
+    "torch_pitch_shift==1.2.5" \
+    "torchmetrics==1.6.1"
+    
