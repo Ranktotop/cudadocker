@@ -16,6 +16,11 @@ docker build -t cudadocker:118_nvenc_torch -f docker118.nvenc.torch .
 docker tag cudadocker:118_nvenc_torch ranktotop/cudadocker:118_nvenc_torch
 docker push ranktotop/cudadocker:118_nvenc_torch
 
+### torch 2.0.1
+docker build -t cudadocker:118_nvenc_torch_201 -f docker118.nvenc.torch2.0.1 .
+docker tag cudadocker:118_nvenc_torch_201 ranktotop/cudadocker:118_nvenc_torch2.0.1
+docker push ranktotop/cudadocker:118_nvenc_torch_201
+
 ### tensorflow
 docker build -t cudadocker:118_nvenc_torch_tensorflow -f docker118.nvenc.torch.tensorflow .
 docker tag cudadocker:118_nvenc_torch_tensorflow ranktotop/cudadocker:118_nvenc_torch_tensorflow
