@@ -23,7 +23,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*z
 
 # --- cuDNN strikt auf 9.3 pinnen (Runtime-only) ---
-# Install cuDNN 8.7 for getting compatibility with tensorflow 2.14 -> https://www.tensorflow.org/install/source#gpu
+# Install cuDNN 9.3 for getting compatibility with tensorflow 2.14 -> https://www.tensorflow.org/install/source#gpu
 RUN apt-get update && apt-get remove -y --allow-change-held-packages "libcudnn9-cuda-12=9.3.0.75-1" || true
 
 # exakt 9.3.0.75 für CUDA 12.5 installieren

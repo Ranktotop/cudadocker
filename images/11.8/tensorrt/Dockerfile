@@ -12,7 +12,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends wget gnupg ca-c
     && apt-get update
 
 # TensorRT 8.5.1 (Runtime) für CUDA 11.8 – strikt versioniert
-# check available versions here: https://developer.download.nvidia.com/compute/cuda/repos/rhel8/x86_64/
+#check available versions here: https://developer.download.nvidia.com/compute/cuda/repos/rhel8/x86_64/
+#check support matrix here: https://www.tensorflow.org/install/source#gpu
 RUN apt-get install -y --no-install-recommends \
     libnvinfer8=8.5.1-1+cuda11.8 \
     libnvinfer-plugin8=8.5.1-1+cuda11.8 \
