@@ -15,11 +15,11 @@ RESOLVED_CUDA="$(readlink -f "$CUDA_HOME" || echo "$CUDA_HOME")"
 echo "[OK] CUDA_HOME: $CUDA_HOME -> $RESOLVED_CUDA"
 
 echo "[CHECK] cuDNN-Version..."
-# Erwartet: cuDNN 8.7.3 für CUDA 12.5, installiert als Paket "libcudnn8"
-if dpkg -s libcudnn8 2>/div/null | grep -q "Version: 8.7.3"; then
-  echo "[OK] libcudnn8 ist 8.7.3 (cuDNN 8.7.3)"
+# Erwartet: cuDNN 8.9.7 für CUDA 12.5, installiert als Paket "libcudnn8"
+if dpkg -s libcudnn8 2>/dev/null | grep -q "Version: 8.9.7"; then
+  echo "[OK] libcudnn8 ist 8.9.7 (cuDNN 8.9.7)"
 else
-  echo "[FAIL] cuDNN nicht korrekt gepinnt (erwartet libcudnn8 Version 8.7.3.*-1+cuda12.5)"
+  echo "[FAIL] cuDNN nicht korrekt gepinnt (erwartet libcudnn8 Version 8.9.7.*)"
   dpkg -s libcudnn8 || true
   exit 1
 fi
