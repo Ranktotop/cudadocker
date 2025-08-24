@@ -22,10 +22,12 @@ RUN apt-get update \
     && apt-mark hold libcublas-12-5 libcublas-dev-12-5 \
     && rm -rf /var/lib/apt/lists/*
 
-# --- cuDNN strikt auf 8.7.3 pinnen (Runtime-only) ---
-# Install cuDNN 8.7.3 for getting compatibility with tensorflow 2.14 -> https://www.tensorflow.org/install/source#gpu
+# --- cuDNN strikt auf 8.9.7 pinnen (Runtime-only) ---
+# Install cuDNN 8.9.7 for getting compatibility with tensorflow 2.14 -> https://www.tensorflow.org/install/source#gpu
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-    "libcudnn8=8.7.3.*-1+cuda12.5" \
+    "libcudnn8=8.9.7.*-1+cuda12.5" \
     && apt-mark hold libcudnn8 \
     && rm -rf /var/lib/apt/lists/*
+
+
