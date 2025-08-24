@@ -1,6 +1,21 @@
 #!/usr/bin/env bash
 set -e
 
+echo "[CHECK] Test if CUDA_HOME and CUB_HOME are set in ENV and valid"
+if [ -z "$CUDA_HOME" ] || [ ! -d "$CUDA_HOME" ]; then
+  echo "[FAIL] CUDA_HOME ist nicht gesetzt oder ungültig"
+  exit 1
+else
+  echo "[OK] CUDA_HOME ist gesetzt und gültig"
+fi
+
+if [ -z "$CUB_HOME" ] || [ ! -d "$CUB_HOME" ]; then
+  echo "[FAIL] CUB_HOME ist nicht gesetzt oder ungültig"
+  exit 1
+else
+  echo "[OK] CUB_HOME ist gesetzt und gültig"
+fi
+
 echo "[CHECK] cuDNN-Version..."
 if dpkg -s libcudnn8 2>/dev/null | grep -q "Version: 8.7.0.84-1+cuda11.8"; then
   echo "[OK] libcudnn8 ist 8.7.0.84-1+cuda11.8"
