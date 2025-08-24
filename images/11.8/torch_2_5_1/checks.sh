@@ -1,34 +1,45 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "[CHECK] Torch-Layer (venv) – GPU REQUIRED"
+echo "[CHECK] Torch-PKG (ohne venv) – GPU REQUIRED"
 
 fail() { echo "[FAIL] $1"; exit 1; }
 
-# 0) venv vorhanden?
-[ -x /opt/venv/bin/python ] || fail "/opt/venv/bin/python fehlt"
+# 0) Pfade prüfen
+TORCH_ROOT="/opt/python/torch"
+[ -d "$TORCH_ROOT" ] || fail "TORCH_ROOT fehlt: $TORCH_ROOT"
+[ -d "$TORCH_ROOT/torch/lib" ] || fail "Torch .so-Verzeichnis fehlt: $TORCH_ROOT/torch/lib"
 
-# 1) Torch & Zusatzmodule importieren und GPU durchsetzen
-/opt/venv/bin/python - <<'PY'
-import sys, importlib
+# 1) Laufzeitpfade setzen (nur für diesen Check)
+export PYTHONPATH="$TORCH_ROOT:${PYTHONPATH:-}"
+export LD_LIBRARY_PATH="$TORCH_ROOT/torch/lib:${LD_LIBRARY_PATH:-}"
+
+# 2) Imports + GPU erzwingen
+python3 - <<'PY'
+import sys, importlib, os
 
 def ok_import(m):
     importlib.import_module(m)
     print("[OK] import", m)
 
-try:
-    ok_import("torch")
-    import torch
-    print(f"[OK] torch {torch.__version__} (built for CUDA {torch.version.cuda})")
-except Exception as e:
-    print("[FAIL] torch Import:", e); sys.exit(1)
+print("[OK] python", sys.version.split()[0])
+
+# Torch
+ok_import("torch")
+import torch
+print(f"[OK] torch {torch.__version__} (built for CUDA {torch.version.cuda})")
 
 # Zusatzpakete
 for m in ("torchvision","torchaudio","torch_audiomentations","torch_pitch_shift","torchmetrics"):
-    try:
-        ok_import(m)
-    except Exception as e:
-        print(f"[FAIL] Import {m}: {e}"); sys.exit(1)
+    ok_import(m)
+
+# NumPy kompatibel?
+import numpy as np
+from packaging import version
+if version.parse(np.__version__).major >= 2:
+    print(f"[FAIL] numpy=={np.__version__} (>=2) – erwarte <2"); sys.exit(1)
+else:
+    print(f"[OK] numpy {np.__version__} (<2)")
 
 # GPU MUSS sichtbar sein
 if not torch.cuda.is_available():
@@ -53,35 +64,27 @@ try:
 except Exception as e:
     print("[FAIL] CUDA Matmul:", e); sys.exit(4)
 
-# Nur Info: cuDNN
+# Info: cuDNN
 try:
     print("[INFO] cudnn available:", torch.backends.cudnn.is_available())
     print("[INFO] cudnn version:", torch.backends.cudnn.version())
 except Exception as e:
     print("[INFO] cudnn info:", e)
 
-# Pfad zur Torch-Lib für den Shell-Teil ausgeben
-import os
-libdir = os.path.join(os.path.dirname(torch.__file__), "lib")
+# Pfad-Info
+import torch as _t
+libdir = os.path.join(os.path.dirname(_t.__file__), "lib")
 print("TORCH_LIBDIR=", libdir)
 PY
 
-# 2) Torch-Shared-Libs vorhanden & ladbar (Präsenzcheck)
-TORCH_LIB_DIR="$(
-  /opt/venv/bin/python - <<'PY'
-import os, torch
-print(os.path.join(os.path.dirname(torch.__file__), "lib"))
-PY
-)"
+# 3) lib-Verzeichnis kurz listen
+echo "[OK] Torch lib dir: $TORCH_ROOT/torch/lib"
+ls -1 "$TORCH_ROOT/torch/lib" | head -n 8 | sed 's/^/[INFO] lib: /'
 
-[ -d "$TORCH_LIB_DIR" ] || fail "Torch lib dir fehlt: $TORCH_LIB_DIR"
-echo "[OK] Torch lib dir: $TORCH_LIB_DIR"
-ls -1 "$TORCH_LIB_DIR" | head -n 8 | sed 's/^/[INFO] lib: /'
-
-# 3) (optional) nvidia-smi nur informativ
+# 4) optional: nvidia-smi
 if command -v nvidia-smi >/dev/null 2>&1; then
   echo "[INFO] nvidia-smi:"
   nvidia-smi -L || true
 fi
 
-echo "[SUCCESS] Torch-Layer OK (GPU sichtbar)"
+echo "[SUCCESS] Torch-PKG OK (GPU sichtbar)"

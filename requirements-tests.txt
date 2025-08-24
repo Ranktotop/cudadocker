@@ -1,5 +1,0 @@
-pytest
-torch
-torchaudio
-tensorflow
-keras
