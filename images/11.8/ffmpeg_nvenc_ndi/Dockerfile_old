@@ -1,0 +1,136 @@
+FROM ranktotop/cudadocker:118_nvenc
+# Arbeitsverzeichnis setzen
+WORKDIR /app
+
+# Installiere notwendige Abhängigkeiten
+RUN apt-get update && apt-get install -y \
+    autoconf automake cmake git libsdl2-dev libtool libva-dev libvdpau-dev \
+    libxcb1-dev libxcb-shm0-dev libxcb-xfixes0-dev pkg-config texinfo wget \
+    zlib1g-dev libmp3lame-dev \
+    libavahi-client-dev \
+    libavahi-common-dev \
+    dbus \
+    avahi-daemon \
+    avahi-utils \
+    python3.10 python3.10-distutils python3-pip \
+    gosu && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+#######################################
+############# INSTALL NDI #############
+#######################################
+# Set ndi version
+ARG NDI_VERSION=6
+
+# Erstelle das Verzeichnis für das NDI SDK und entpacke die Datei NDI_SDK${NDI_VERSION}.tar.gz
+COPY NDI_SDK${NDI_VERSION}.tar.gz /tmp/NDI_SDK${NDI_VERSION}.tar.gz
+RUN mkdir -p /opt/ndi-sdk && \
+    tar --strip-components=1 -xzf /tmp/NDI_SDK${NDI_VERSION}.tar.gz -C /opt/ndi-sdk
+
+# Füge den NDI SDK-Pfad zur ldconfig-Konfiguration hinzu und aktualisiere den Cache
+RUN echo "/opt/ndi-sdk/lib/x86_64-linux-gnu" | tee /etc/ld.so.conf.d/ndi.conf && ldconfig
+# Setze LD_LIBRARY_PATH, damit dynamische Bibliotheken gefunden werden
+ENV LD_LIBRARY_PATH=/opt/ndi-sdk/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
+# Optional: Setze PATH, wenn es ausführbare Dateien im SDK gibt
+ENV PATH=/opt/ndi-sdk/bin:$PATH
+
+#######################################
+########### COMPILE FFMPEG ############
+#######################################
+
+# Arbeitsverzeichnis für FFmpeg-Build setzen
+WORKDIR /tmp/ffmpeg-build
+
+# Erstelle das Verzeichnis für den FFmpeg-Build
+RUN mkdir -p /tmp/ffmpeg-build
+
+# Lade den FFmpeg 6.1.1 Quellcode herunter
+RUN wget https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n6.1.1.tar.gz && \
+    tar -xzf n6.1.1.tar.gz
+
+# Benenne das richtige Verzeichnis um
+RUN mv FFmpeg-n6.1.1 ffmpeg
+
+# Kopiere den Patch für NDI-Unterstützung
+COPY .docker/ndi-support.patch /tmp/ffmpeg-build/ffmpeg/
+
+# Wechsle ins FFmpeg-Verzeichnis
+WORKDIR /tmp/ffmpeg-build/ffmpeg
+
+# Wende den NDI-Patch auf den FFmpeg-Quellcode an
+RUN patch -p1 < ndi-support.patch
+
+# Konfiguriere den Build mit den gewünschten Optionen OHNE CUDA
+RUN LD_LIBRARY_PATH=/usr/local/cuda/lib64/stubs:${LD_LIBRARY_PATH} ./configure \
+    --prefix=/usr/local \
+    --extra-cflags="-I/opt/ndi-sdk/include -I/usr/local/cuda/include" \
+    --extra-ldflags="-L/opt/ndi-sdk/lib/x86_64-linux-gnu -L/usr/local/cuda/lib64" \
+    --enable-gpl \
+    --enable-nonfree \
+    --enable-libx264 \
+    --enable-libx265 \
+    --enable-libvpx \
+    --enable-libfdk-aac \
+    --enable-libmp3lame \
+    --enable-libopus \
+    --enable-libndi_newtek \
+    --enable-cuda \
+    --enable-cuvid \
+    --enable-nvenc \
+    --enable-nvdec \
+    --enable-libnpp \
+    --disable-static \
+    --enable-shared
+
+# Kompiliere FFmpeg
+RUN make -j$(nproc)
+
+# Installiere FFmpeg
+RUN make install
+
+# Bereinige nach der Installation
+RUN make distclean && \
+    rm -rf /tmp/ffmpeg-build
+
+###############################
+##### SETUP START SCRIPT ######
+###############################
+
+# Set working directory
+WORKDIR /app
+
+# Kopiere Skripte und mach sie ausführbar
+COPY .docker/start.sh .docker/entrypoint.sh .docker/init.sh /app/
+RUN chmod +x /app/start.sh /app/entrypoint.sh /app/init.sh
+
+#######################################
+########## SYSTEM CONFIGURATION #######
+#######################################
+
+# Erstelle das Verzeichnis für den Avahi-Dienst und setze Berechtigungen
+RUN mkdir -p /var/run/avahi-daemon /run/avahi-daemon && \
+    chown root:avahi /var/run/avahi-daemon /run/avahi-daemon && \
+    chmod 775 /var/run/avahi-daemon /run/avahi-daemon
+
+# Erstelle das Verzeichnis für den dbus-Dienst und setze Berechtigungen
+RUN mkdir -p /run/dbus && \
+    chown root:messagebus /run/dbus && \
+    chmod 775 /run/dbus
+
+###############################
+####### SET OWNERSHIPS ########
+###############################
+RUN mkdir -p /home/appuser/.local/bin /appuser/.local/bin /app/logs && touch /app/logs/app.log
+
+# Add local bins to PATH
+ENV PATH="/appuser/.local/bin:/home/appuser/.local/bin:$PATH"
+# Set home var
+ENV HOME=/home/appuser
+
+########################################
+######### SET USER AND START ###########
+########################################
+
+# Start deamons using root and start.sh using appuser
+ENTRYPOINT [ "/app/entrypoint.sh" ]
