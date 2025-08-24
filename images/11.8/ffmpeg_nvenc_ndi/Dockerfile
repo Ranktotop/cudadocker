@@ -60,7 +60,12 @@ RUN AVAHI_LIBS="$(pkg-config --libs avahi-client avahi-common)" && \
     --enable-libmp3lame --enable-libopus --enable-libvorbis --enable-libvpx \
     --enable-libx264 --enable-libx265 --enable-libfdk-aac \
     --enable-cuda --enable-nvenc --enable-nvdec --enable-cuvid --enable-libnpp \
-    && make -j"$(nproc)" && make install \
+    --disable-ffplay \
+    --disable-doc --disable-debug \
+    && make -j"$(nproc)" \
+    && make install \
+    && ls -la /opt/ffmpeg-ndi/bin \
+    && /opt/ffmpeg-ndi/bin/ffmpeg -hide_banner -version \
     && strip /opt/ffmpeg-ndi/bin/ffmpeg /opt/ffmpeg-ndi/bin/ffprobe || true
 
 # NPP-Libs für Runtime bündeln
