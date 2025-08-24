@@ -5,6 +5,8 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
+    CUDA_HOME=/usr/local/cuda \
+    CUB_HOME=/usr/local/cuda/include \
     FORCE_CUDA=1 \
     NVIDIA_DRIVER_CAPABILITIES=all
 
