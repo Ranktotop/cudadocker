@@ -2,6 +2,22 @@
 
 Dockerfiles are in images/<cuda-version>/<variant>.
 
+## Using the Makefile
+
+A Makefile wraps the image builds and basic tests.
+
+```bash
+# build the image at images/11.8/nvenc-torch
+make build VERSION=11.8 FLAVOR=nvenc-torch
+
+# run the test suite inside the built image
+make test VERSION=11.8 FLAVOR=nvenc-torch
+```
+
+The variables `VERSION` and `FLAVOR` map directly to the directory
+structure below `images/`. Adding new variants only requires creating the
+corresponding directory; the targets above will pick them up automatically.
+
 ## Cuda 11.8
 ### base
 docker build -t cudadocker:118_base images/11.8/base
