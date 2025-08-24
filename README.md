@@ -18,6 +18,12 @@ The variables `VERSION` and `FLAVOR` map directly to the directory
 structure below `images/`. Adding new variants only requires creating the
 corresponding directory; the targets above will pick them up automatically.
 
+## Continuous Integration
+
+A [GitHub Actions](.github/workflows/docker.yml) workflow builds each image and
+runs the test suite inside a container with `pytest`. Build and test logs are
+uploaded as artifacts to help with debugging.
+
 ## Cuda 11.8
 ### base
 docker build -t cudadocker:118_base images/11.8/base
