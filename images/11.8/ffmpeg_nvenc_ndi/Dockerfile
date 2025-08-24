@@ -6,6 +6,7 @@
 FROM nvidia/cuda:11.8.0-devel-ubuntu22.04 AS build
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Build-Tools + Dev-Libs (NDI + Codecs + HTTPS)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     autoconf automake build-essential cmake git-core libtool pkg-config texinfo \
     yasm nasm \
@@ -15,17 +16,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgnutls28-dev zlib1g-dev \
     libnuma-dev \
     wget ca-certificates curl \
+    # <<< ADDED: Avahi Dev (für Link mit libndi)
+    libavahi-client-dev libavahi-common-dev \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /tmp/ffmpeg-build
 ARG NDI_VERSION=6
 
+# NDI SDK
 COPY NDI_SDK${NDI_VERSION}.tar.gz /tmp/NDI_SDK${NDI_VERSION}.tar.gz
 RUN mkdir -p /opt/ndi-sdk && \
     tar --strip-components=1 -xzf /tmp/NDI_SDK${NDI_VERSION}.tar.gz -C /opt/ndi-sdk && \
     echo "/opt/ndi-sdk/lib/x86_64-linux-gnu" > /etc/ld.so.conf.d/ndi.conf && ldconfig
 
-# ---- nv-codec-headers: kompatibler Commit (11.1.5.3) ----
+# nv-codec-headers (kompatibler Commit)
 RUN git clone https://git.videolan.org/git/ffmpeg/nv-codec-headers.git /tmp/nvch && \
     cd /tmp/nvch && \
     git checkout 43d91706e097565f57b311e567f0219838bcc2f6 && \
@@ -38,13 +42,15 @@ WORKDIR /tmp/ffmpeg-build/ffmpeg
 COPY ndi-support.patch ./ndi-support.patch
 RUN patch -p1 < ndi-support.patch
 
-# ---- Configure ----
-RUN PKG_CONFIG_PATH="/usr/local/lib/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig" \
+# FFmpeg konfigurieren (NDI+NVENC+Codecs; dynamisch gelinkt)
+# <<< ADDED: PKG_CONFIG_PATH erweitert (ffnvcodec.pc) + Avahi-Libs an den Linker
+RUN AVAHI_LIBS="$(pkg-config --libs avahi-client avahi-common)" && \
+    PKG_CONFIG_PATH="/usr/local/lib/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig" \
     ./configure \
     --prefix="/opt/ffmpeg-ndi" \
     --extra-cflags="-I/opt/ndi-sdk/include -I/usr/local/cuda/include" \
     --extra-ldflags="-L/opt/ndi-sdk/lib/x86_64-linux-gnu -L/usr/local/cuda/lib64 -Wl,-rpath,/opt/ndi-sdk/lib/x86_64-linux-gnu" \
-    --extra-libs="-ldl -lpthread" \
+    --extra-libs="-ldl -lpthread ${AVAHI_LIBS}" \
     --bindir="/opt/ffmpeg-ndi/bin" \
     --libdir="/opt/ffmpeg-ndi/lib" \
     --enable-gpl --enable-nonfree \
@@ -66,6 +72,7 @@ RUN mkdir -p /tmp/ndi_runtime/usr/local/lib && \
 #########################
 FROM ranktotop/cudadocker:11.8_base
 
+# Runtime-Libs (für dynamische Codecs) – klein, aber vollständig
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libass9 libfreetype6 libfontconfig1 \
     libmp3lame0 libopus0 libvorbis0a libvorbisenc2 \
@@ -74,14 +81,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libx264-163 \
     libfdk-aac2 \
     libnuma1 \
+    # <<< ADDED: Avahi Runtime (libndi braucht diese .so)
+    libavahi-client3 libavahi-common3 \
     && rm -rf /var/lib/apt/lists/*
 
+# NDI SDK Runtime
 COPY --from=build /opt/ndi-sdk/ /opt/ndi-sdk/
 RUN echo "/opt/ndi-sdk/lib/x86_64-linux-gnu" > /etc/ld.so.conf.d/ndi.conf && ldconfig
 ENV LD_LIBRARY_PATH=/opt/ndi-sdk/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
 
+# NPP-Libs rüberziehen
 COPY --from=build /tmp/ndi_runtime/usr/local/lib/ /usr/local/lib/
 RUN ldconfig || true
 
+# FFmpeg (mit NDI)
 COPY --from=build /opt/ffmpeg-ndi/bin/ffmpeg  /usr/local/bin/ffmpeg
 COPY --from=build /opt/ffmpeg-ndi/bin/ffprobe /usr/local/bin/ffprobe
