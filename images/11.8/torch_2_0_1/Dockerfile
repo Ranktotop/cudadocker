@@ -20,3 +20,15 @@ RUN mkdir -p /opt/python/torch \
     torch_pitch_shift==1.2.5 \
     torchmetrics==1.6.1 \
     --target /opt/python/torch
+
+# create constraint file for preventing torch reinstalls
+RUN printf '%s\n' \
+    'torch==2.0.1' \
+    'torchvision==0.15.2' \
+    'torchaudio==2.0.2' \
+    'torch-audiomentations==0.11.2' \
+    'torch_pitch_shift==1.2.5' \
+    'torchmetrics==1.6.1' \
+    'sympy==1.13.1' \
+    'numpy<2' \
+    > /opt/python/torch/constraints_torch.txt
