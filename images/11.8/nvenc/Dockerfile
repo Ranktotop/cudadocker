@@ -67,8 +67,7 @@ RUN PKG_CONFIG_PATH="/root/ffmpeg_build/lib/pkgconfig" \
     --enable-librubberband \
     --enable-libass --enable-libfreetype --enable-libfontconfig \
     --enable-libmp3lame --enable-libopus --enable-libvorbis --enable-libvpx \
-    --enable-libx264 \
-    --enable-libx265 \
+    --enable-libx264 --enable-libx265 --enable-libfdk-aac \
     --enable-cuda --enable-cuda-nvcc --enable-nvenc --enable-nvdec \
     --enable-libnpp \
     && make -j"$(nproc)" && make install && hash -r \
