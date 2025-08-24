@@ -27,6 +27,11 @@ RUN mkdir -p /opt/ndi-sdk && \
     tar --strip-components=1 -xzf /tmp/NDI_SDK${NDI_VERSION}.tar.gz -C /opt/ndi-sdk && \
     echo "/opt/ndi-sdk/lib/x86_64-linux-gnu" > /etc/ld.so.conf.d/ndi.conf && ldconfig
 
+# NVENC/NVDEC headers (ffnvcodec.pc) – muss VOR ./configure passieren
+RUN git clone https://git.videolan.org/git/ffmpeg/nv-codec-headers.git /tmp/nvch \
+    && make -C /tmp/nvch \
+    && make -C /tmp/nvch install
+
 # FFmpeg Quelle + (optional) NDI Patch
 RUN wget -O ffmpeg-6.1.1.tar.gz https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n6.1.1.tar.gz && \
     tar -xzf ffmpeg-6.1.1.tar.gz && mv FFmpeg-n6.1.1 ffmpeg
@@ -35,7 +40,7 @@ COPY ndi-support.patch ./ndi-support.patch
 RUN patch -p1 < ndi-support.patch
 
 # FFmpeg konfigurieren (NDI+NVENC+Codecs; dynamisch gelinkt)
-RUN PKG_CONFIG_PATH="/usr/lib/x86_64-linux-gnu/pkgconfig" \
+RUN PKG_CONFIG_PATH="/usr/local/lib/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig" \
     ./configure \
     --prefix="/opt/ffmpeg-ndi" \
     --extra-cflags="-I/opt/ndi-sdk/include -I/usr/local/cuda/include" \
@@ -52,6 +57,10 @@ RUN PKG_CONFIG_PATH="/usr/lib/x86_64-linux-gnu/pkgconfig" \
     --enable-cuda --enable-nvenc --enable-nvdec --enable-libnpp \
     && make -j"$(nproc)" && make install \
     && strip /opt/ffmpeg-ndi/bin/ffmpeg /opt/ffmpeg-ndi/bin/ffprobe || true
+
+# NPP-Libs für Runtime bündeln (falls Base sie nicht enthält)
+RUN mkdir -p /tmp/ndi_runtime/usr/local/lib && \
+    cp -a /usr/local/cuda/lib64/libnpp*.so* /tmp/ndi_runtime/usr/local/lib/ || tr
 
 #########################
 # Stage 2: Runtime-Base #
@@ -73,6 +82,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY --from=build /opt/ndi-sdk/ /opt/ndi-sdk/
 RUN echo "/opt/ndi-sdk/lib/x86_64-linux-gnu" > /etc/ld.so.conf.d/ndi.conf && ldconfig
 ENV LD_LIBRARY_PATH=/opt/ndi-sdk/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
+
+# NPP-Libs rüberziehen (für --enable-libnpp)
+COPY --from=build /tmp/ndi_runtime/usr/local/lib/ /usr/local/lib/
+RUN ldconfig || true
 
 # FFmpeg (als separate Binaries, um nicht dein anderes ffmpeg zu überschreiben)
 COPY --from=build /opt/ffmpeg-ndi/bin/ffmpeg  /usr/local/bin/ffmpeg
