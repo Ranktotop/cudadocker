@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # --- cuDNN strikt auf 8.7 pinnen (Runtime-only) ---
-# evtl. vorinstallierte Version entfernen
+# Install cuDNN 8.7 for getting compatibility with tensorflow 2.14 -> https://www.tensorflow.org/install/source#gpu
 RUN apt-get update && apt-get remove -y --allow-change-held-packages libcudnn8 libcudnn8-dev || true
 
 # exakt 8.7.0.84 für CUDA 11.8 installieren

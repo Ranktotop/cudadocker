@@ -37,7 +37,10 @@ PY
 echo "[CHECK] trtexec vorhanden"
 if command -v trtexec >/dev/null 2>&1; then
   trtexec --version || true
-  echo "[OK] trtexec verfügbar"
+  echo "[OK] trtexec verfügbar (PATH)"
+elif [ -x /usr/src/tensorrt/bin/trtexec ]; then
+  /usr/src/tensorrt/bin/trtexec --version || true
+  echo "[OK] trtexec verfügbar (/usr/src/tensorrt/bin)"
 else
-  echo "[FAIL] trtexec fehlt (libnvinfer-bin sollte es liefern)"; exit 1
+  echo "[FAIL] trtexec fehlt (kommt normalerweise mit libnvinfer-bin)"; exit 1
 fi

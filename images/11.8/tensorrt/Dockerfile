@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends wget gnupg ca-c
     && apt-get update
 
 # TensorRT 8.5.1 (Runtime) für CUDA 11.8 – strikt versioniert
-# (trtexec kommt aus libnvinfer-bin)
+# check available versions here: https://developer.download.nvidia.com/compute/cuda/repos/rhel8/x86_64/
 RUN apt-get install -y --no-install-recommends \
     libnvinfer8=8.5.1-1+cuda11.8 \
     libnvinfer-plugin8=8.5.1-1+cuda11.8 \
@@ -22,4 +22,9 @@ RUN apt-get install -y --no-install-recommends \
     && apt-mark hold libnvinfer8 libnvinfer-plugin8 libnvparsers8 libnvonnxparsers8 libnvinfer-bin \
     && rm -rf /var/lib/apt/lists/*
 
-# keine Symlinks, kein LD_LIBRARY_PATH-Gefummel nötig; ldconfig wird durch apt getriggert
+# trtexec in den PATH verlinken, falls von libnvinfer-bin bereitgestellt
+RUN if [ -x /usr/src/tensorrt/bin/trtexec ]; then \
+    ln -sf /usr/src/tensorrt/bin/trtexec /usr/local/bin/trtexec; \
+    else \
+    echo "WARN: /usr/src/tensorrt/bin/trtexec nicht gefunden"; \
+    fi
