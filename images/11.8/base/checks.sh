@@ -1,6 +1,19 @@
 #!/usr/bin/env bash
 set -e
 
+echo "[CHECK] CUDA_HOME gesetzt & gültig?"
+
+fail() { echo "[FAIL] $1"; exit 1; }
+
+# Vorhanden?
+[ -n "${CUDA_HOME:-}" ] || fail "CUDA_HOME ist nicht gesetzt"
+# Verzeichnis existiert?
+[ -d "$CUDA_HOME" ]     || fail "CUDA_HOME existiert nicht: $CUDA_HOME"
+
+# Symlink-Auflösung nur informativ
+RESOLVED_CUDA="$(readlink -f "$CUDA_HOME" || echo "$CUDA_HOME")"
+echo "[OK] CUDA_HOME: $CUDA_HOME -> $RESOLVED_CUDA"
+
 echo "[CHECK] cuDNN-Version..."
 if dpkg -s libcudnn8 2>/dev/null | grep -q "Version: 8.7.0.84-1+cuda11.8"; then
   echo "[OK] libcudnn8 ist 8.7.0.84-1+cuda11.8"
