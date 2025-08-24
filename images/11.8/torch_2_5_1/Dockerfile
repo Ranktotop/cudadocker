@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.6
 
 # PyTorch (cu118) Runtime-Layer
-FROM cudadocker:11.8_base
+FROM ranktotop/cudadocker:11.8_base
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PIP_NO_CACHE_DIR=1 \
