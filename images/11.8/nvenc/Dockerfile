@@ -97,6 +97,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libfftw3-3 libsamplerate0 libsndfile1 \
     libx264-163 \
     libfdk-aac2 \
+    libnuma1 \ 
     && rm -rf /var/lib/apt/lists/*
 
 # FFmpeg-Binaries
