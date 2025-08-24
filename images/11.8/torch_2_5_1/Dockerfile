@@ -7,9 +7,13 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PATH="/opt/venv/bin:${PATH}" \
     LD_LIBRARY_PATH="/opt/venv/lib/python3.10/site-packages/torch/lib:${LD_LIBRARY_PATH}"
 
+# venv bereitstellen
+RUN apt-get update && apt-get install -y --no-install-recommends python3-venv \
+    && rm -rf /var/lib/apt/lists/*
+
 # PyTorch 2.5.1 (cu118) + Addons in venv
 RUN python3 -m venv /opt/venv \
-    && /opt/venv/bin/pip install --upgrade pip \
+    && /opt/venv/bin/pip install --upgrade pip setuptools wheel \
     && /opt/venv/bin/pip install --extra-index-url https://download.pytorch.org/whl/cu118 \
     torch==2.5.1 \
     torchvision==0.20.1 \
