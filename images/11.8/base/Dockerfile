@@ -1,97 +1,26 @@
-FROM nvidia/cuda:11.8.0-cudnn8-devel-ubuntu22.04
+# bases/11.8_base-core.Dockerfile
+FROM nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04
 
-# Tell the CUDA environment what GPU features to expose in the container.
-ENV NVIDIA_DRIVER_CAPABILITIES=all
-#ENV NVIDIA_VISIBLE_DEVICES=0
-#ENV CUDA_VISIBLE_DEVICES=0
-ENV DEBIAN_FRONTEND=noninteractive
+ENV DEBIAN_FRONTEND=noninteractive \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    gstreamer1.0-alsa \
-    gstreamer1.0-gl \
-    gstreamer1.0-gtk3 \
-    gstreamer1.0-libav \
-    gstreamer1.0-plugins-bad \
-    gstreamer1.0-plugins-base \
-    gstreamer1.0-plugins-good \
-    gstreamer1.0-plugins-ugly \
-    gstreamer1.0-pulseaudio \
-    gstreamer1.0-qt5 \
-    gstreamer1.0-tools \
-    gstreamer1.0-x \
-    libgstreamer-plugins-bad1.0-dev \
-    libgstreamer-plugins-base1.0-dev \
-    libgstreamer1.0-dev \
-    libgtk2.0-0 \
-    libunwind-dev \
-    libvulkan1 \
-    libxcb-xkb1 \
-    libxcb1 \
-    libxcb-cursor0 \
-    python3-pip \
-    wget \
-    curl \
-    git \
-    nano \
-    iputils-ping \
-    net-tools \
-    fonts-inter &&\
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+# Systembasics
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 python3-pip python3-distutils \
+    wget nano curl iputils-ping \
+    ca-certificates \
+    libvulkan1 libglib2.0-0 libstdc++6 \
+    && rm -rf /var/lib/apt/lists/*
 
-#######################################
-########## DOWNGRADE cuDNN ############
-#######################################
+# --- cuDNN strikt auf 8.7 pinnen (Runtime-only) ---
+# evtl. vorinstallierte Version entfernen
+RUN apt-get update && apt-get remove -y --allow-change-held-packages libcudnn8 libcudnn8-dev || true
 
-# Remove existing cuDNN 8.9 for installing cuDNN 8.7
-RUN apt-get update && apt-get remove -y --allow-change-held-packages libcudnn8 libcudnn8-dev
-
-# Fügen Sie das NVIDIA-Paket-Repository hinzu
-#RUN apt-get update && apt-get install -y wget gnupg && \
-#    wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.1-1_all.deb && \
-#    dpkg -i cuda-keyring_1.1-1_all.deb && \
-#    apt-get update
-
-# Install cuDNN 8.7 for getting compatibility with tensorflow 2.14 -> https://www.tensorflow.org/install/source#gpu
-#RUN apt-get install -y libcudnn8=8.7.0.*-1+cuda11.8 libcudnn8-dev=8.7.0.*-1+cuda11.8
-
-# Install cuDNN 8.7 for getting compatibility with tensorflow 2.14
-RUN wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/libcudnn8_8.7.0.84-1+cuda11.8_amd64.deb -O libcudnn8.deb && \
-    dpkg -i libcudnn8.deb && \
-    rm libcudnn8.deb
-
-RUN wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/libcudnn8-dev_8.7.0.84-1+cuda11.8_amd64.deb -O libcudnn8-dev.deb && \
-    dpkg -i libcudnn8-dev.deb && \
-    rm libcudnn8-dev.deb
-
-# Update dynamic linker run-time bindings
-RUN ldconfig
-
-# Erstelle die Symlinks für cuDNN-Bibliotheken
-RUN ln -s /usr/lib/x86_64-linux-gnu/libcudnn.so.8 /usr/local/cuda/lib64/libcudnn.so.8 && \
-    ln -s /usr/lib/x86_64-linux-gnu/libcudnn.so.8.7.0 /usr/local/cuda/lib64/libcudnn.so.8.7.0 && \
-    ln -s /usr/lib/x86_64-linux-gnu/libcudnn.so /usr/local/cuda/lib64/libcudnn.so
-#replace the wrong nvidia path with correct one
-ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64
-ENV CUDA_HOME=/usr/local/cuda
-ENV CUB_HOME=/usr/local/cuda/include
-ENV FORCE_CUDA=1
-
-#######################################
-######### INSTALL TENSORRT ############
-#######################################
-
-#check available versions here: https://developer.download.nvidia.com/compute/cuda/repos/rhel8/x86_64/
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    libnvinfer8=8.5.1-1+cuda11.8 \
-    libnvinfer-dev=8.5.1-1+cuda11.8 \
-    libnvinfer-plugin8=8.5.1-1+cuda11.8 \
-    libnvparsers8=8.5.1-1+cuda11.8 \
-    libnvparsers-dev=8.5.1-1+cuda11.8 \
-    libnvinfer-bin=8.5.1-1+cuda11.8 \
-    libnvonnxparsers8=8.5.1-1+cuda11.8 \
-    libnvonnxparsers-dev=8.5.1-1+cuda11.8 && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+# exakt 8.7.0.84 für CUDA 11.8 installieren
+RUN wget -q https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/libcudnn8_8.7.0.84-1+cuda11.8_amd64.deb -O /tmp/libcudnn8.deb \
+    && dpkg -i /tmp/libcudnn8.deb \
+    && rm -f /tmp/libcudnn8.deb \
+    && ldconfig \
+    && apt-mark hold libcudnn8
