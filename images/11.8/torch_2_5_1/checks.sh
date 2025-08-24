@@ -1,49 +1,87 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
 
-echo "[CHECK] Python & Torch import"
-python3 - <<'PY'
-import sys, torch
-print("[OK] python", sys.version.split()[0])
-print("[OK] torch", torch.__version__, "cuda:", torch.version.cuda)
+echo "[CHECK] Torch-Layer (venv) – GPU REQUIRED"
 
-# cuDNN-Infos (kann None sein)
+fail() { echo "[FAIL] $1"; exit 1; }
+
+# 0) venv vorhanden?
+[ -x /opt/venv/bin/python ] || fail "/opt/venv/bin/python fehlt"
+
+# 1) Torch & Zusatzmodule importieren und GPU durchsetzen
+/opt/venv/bin/python - <<'PY'
+import sys, importlib
+
+def ok_import(m):
+    importlib.import_module(m)
+    print("[OK] import", m)
+
+try:
+    ok_import("torch")
+    import torch
+    print(f"[OK] torch {torch.__version__} (built for CUDA {torch.version.cuda})")
+except Exception as e:
+    print("[FAIL] torch Import:", e); sys.exit(1)
+
+# Zusatzpakete
+for m in ("torchvision","torchaudio","torch_audiomentations","torch_pitch_shift","torchmetrics"):
+    try:
+        ok_import(m)
+    except Exception as e:
+        print(f"[FAIL] Import {m}: {e}"); sys.exit(1)
+
+# GPU MUSS sichtbar sein
+if not torch.cuda.is_available():
+    print("[FAIL] torch.cuda.is_available = False. Container mit '--gpus all' starten.")
+    sys.exit(2)
+
+dc = torch.cuda.device_count()
+if dc < 1:
+    print(f"[FAIL] Keine CUDA-Geräte sichtbar (count={dc}). Container mit '--gpus all' starten.")
+    sys.exit(3)
+
+name = torch.cuda.get_device_name(0)
+cap  = torch.cuda.get_device_capability(0)
+print(f"[OK] device count: {dc}")
+print(f"[OK] device 0: {name} capability {cap}")
+
+# Mini CUDA-Test (Matmul)
+try:
+    x = torch.randn(512,512, device="cuda"); y = torch.randn(512,512, device="cuda")
+    z = (x @ y).mean().item()
+    print("[OK] CUDA matmul ok; mean:", z)
+except Exception as e:
+    print("[FAIL] CUDA Matmul:", e); sys.exit(4)
+
+# Nur Info: cuDNN
 try:
     print("[INFO] cudnn available:", torch.backends.cudnn.is_available())
     print("[INFO] cudnn version:", torch.backends.cudnn.version())
 except Exception as e:
-    print("[WARN] cudnn info:", e)
+    print("[INFO] cudnn info:", e)
 
-# Zusatzpakete
-mods = ["torchvision","torchaudio","torch_audiomentations","torch_pitch_shift","torchmetrics"]
-for m in mods:
-    try:
-        __import__(m)
-        print("[OK] import", m)
-    except Exception as e:
-        print("[FAIL] import", m, "->", e); raise
-
-# CUDA-Verfügbarkeit (nicht zwingend in CI/ohne --gpus all)
-if torch.cuda.is_available():
-    print("[OK] torch.cuda.is_available = True")
-    print("[INFO] device count:", torch.cuda.device_count())
-    print("[INFO] device 0:", torch.cuda.get_device_name(0))
-    # Mini-Kernel-Test
-    x = torch.randn(1024, 1024, device="cuda")
-    y = torch.randn(1024, 1024, device="cuda")
-    z = (x @ y).mean().item()
-    print("[OK] matmul on CUDA, mean:", z)
-else:
-    print("[INFO] torch.cuda.is_available = False (ok ohne --gpus all)")
+# Pfad zur Torch-Lib für den Shell-Teil ausgeben
+import os
+libdir = os.path.join(os.path.dirname(torch.__file__), "lib")
+print("TORCH_LIBDIR=", libdir)
 PY
 
-# Prüfe, dass Torch-Libs im Pfad liegen (reine Präsenzprüfung, nicht zwingend vollständig)
-TLP="/usr/local/lib/python3.10/dist-packages/torch/lib"
-if [ -d "$TLP" ]; then
-  echo "[OK] Torch lib dir: $TLP"
-  ls -1 "$TLP" | head -n 5 | sed 's/^/[INFO] lib: /'
-else
-  echo "[FAIL] Torch lib dir fehlt: $TLP"; exit 1
+# 2) Torch-Shared-Libs vorhanden & ladbar (Präsenzcheck)
+TORCH_LIB_DIR="$(
+  /opt/venv/bin/python - <<'PY'
+import os, torch
+print(os.path.join(os.path.dirname(torch.__file__), "lib"))
+PY
+)"
+
+[ -d "$TORCH_LIB_DIR" ] || fail "Torch lib dir fehlt: $TORCH_LIB_DIR"
+echo "[OK] Torch lib dir: $TORCH_LIB_DIR"
+ls -1 "$TORCH_LIB_DIR" | head -n 8 | sed 's/^/[INFO] lib: /'
+
+# 3) (optional) nvidia-smi nur informativ
+if command -v nvidia-smi >/dev/null 2>&1; then
+  echo "[INFO] nvidia-smi:"
+  nvidia-smi -L || true
 fi
 
-echo "[SUCCESS] Torch-Layer OK"
+echo "[SUCCESS] Torch-Layer OK (GPU sichtbar)"
