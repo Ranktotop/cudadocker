@@ -35,12 +35,18 @@ print("[SUCCESS] TensorRT libs laden")
 PY
 
 echo "[CHECK] trtexec vorhanden"
+# 1) Im PATH?
 if command -v trtexec >/dev/null 2>&1; then
-  trtexec --version || true
-  echo "[OK] trtexec verfügbar (PATH)"
+  BIN="$(command -v trtexec)"
+  # Versionzeile nur informativ ausgeben, Exitcode ignorieren
+  VER_LINE="$(trtexec --help 2>&1 | head -n 1 || true)"
+  echo "[OK] trtexec gefunden: $BIN"
+  [ -n "$VER_LINE" ] && echo "[INFO] $VER_LINE"
+# 2) Fallback: Standardpfad des Pakets
 elif [ -x /usr/src/tensorrt/bin/trtexec ]; then
-  /usr/src/tensorrt/bin/trtexec --version || true
-  echo "[OK] trtexec verfügbar (/usr/src/tensorrt/bin)"
+  /usr/src/tensorrt/bin/trtexec --help >/dev/null 2>&1 || true
+  echo "[OK] trtexec gefunden: /usr/src/tensorrt/bin/trtexec"
+# 3) Fehlermeldung
 else
-  echo "[FAIL] trtexec fehlt (kommt normalerweise mit libnvinfer-bin)"; exit 1
+  echo "[FAIL] trtexec fehlt (kommt i.d.R. mit libnvinfer-bin)"; exit 1
 fi
