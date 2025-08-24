@@ -75,8 +75,8 @@ RUN echo "/opt/ndi-sdk/lib/x86_64-linux-gnu" > /etc/ld.so.conf.d/ndi.conf && ldc
 ENV LD_LIBRARY_PATH=/opt/ndi-sdk/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
 
 # FFmpeg (als separate Binaries, um nicht dein anderes ffmpeg zu überschreiben)
-COPY --from=build /opt/ffmpeg-ndi/bin/ffmpeg  /usr/local/bin/ffmpeg-ndi
-COPY --from=build /opt/ffmpeg-ndi/bin/ffprobe /usr/local/bin/ffprobe-ndi
+COPY --from=build /opt/ffmpeg-ndi/bin/ffmpeg  /usr/local/bin/ffmpeg
+COPY --from=build /opt/ffmpeg-ndi/bin/ffprobe /usr/local/bin/ffprobe
 
 # Optional: symlinks setzen, wenn du dieses FFmpeg "als Standard" willst
 # RUN ln -sf /usr/local/bin/ffmpeg-ndi /usr/local/bin/ffmpeg && \

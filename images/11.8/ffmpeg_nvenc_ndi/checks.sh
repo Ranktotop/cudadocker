@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 set -e
 
-echo "[CHECK] ffmpeg-ndi vorhanden?"
-ffmpeg-ndi -hide_banner -version
+echo "[CHECK] ffmpeg vorhanden?"
+ffmpeg -hide_banner -version
 
 echo "[CHECK] NDI-Library gelinkt?"
-ldd "$(command -v ffmpeg-ndi)" | grep -qi 'libndi' \
+ldd "$(command -v ffmpeg)" | grep -qi 'libndi' \
   && echo "[OK] libndi verlinkt" \
   || { echo "[FAIL] libndi nicht verlinkt"; exit 1; }
 
 echo "[CHECK] Build-Flags (NDI/NVENC/HTTPS/Codecs)..."
-BUILD="$(ffmpeg-ndi -hide_banner -buildconf 2>/dev/null || true)"
+BUILD="$(ffmpeg -hide_banner -buildconf 2>/dev/null || true)"
 for flag in \
   --enable-libndi_newtek \
   --enable-nvenc --enable-nvdec --enable-cuda --enable-libnpp \
@@ -27,9 +27,9 @@ do
 done
 
 echo "[CHECK] NDI-Library gelinkt?"
-ldd "$(command -v ffmpeg-ndi)" | grep -qi 'libndi' && echo "[OK] libndi verlinkt" || { echo "[FAIL] libndi nicht verlinkt"; exit 1; }
+ldd "$(command -v ffmpeg)" | grep -qi 'libndi' && echo "[OK] libndi verlinkt" || { echo "[FAIL] libndi nicht verlinkt"; exit 1; }
 
 echo "[CHECK] Protokolle: https?"
-ffmpeg-ndi -hide_banner -protocols | grep -q '\bhttps\b' && echo "[OK] https" || { echo "[FAIL] https fehlt"; exit 1; }
+ffmpeg -hide_banner -protocols | grep -q '\bhttps\b' && echo "[OK] https" || { echo "[FAIL] https fehlt"; exit 1; }
 
 echo "[SUCCESS] NDI-FFmpeg Checks bestanden."
