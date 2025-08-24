@@ -15,20 +15,21 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libvulkan1 libglib2.0-0 libstdc++6 \
     && rm -rf /var/lib/apt/lists/*
 
-# libcublas exakt pinnen
+# --- libcublas exakt pinnen ---
 RUN apt-get update \
     && apt-get install -y --allow-change-held-packages \
     "libcublas-12-5=12.5.3.2-1" "libcublas-dev-12-5=12.5.3.2-1" \
     && apt-mark hold libcublas-12-5 libcublas-dev-12-5 \
-    && rm -rf /var/lib/apt/lists/*z
+    && rm -rf /var/lib/apt/lists/*
 
 # --- cuDNN strikt auf 9.3 pinnen (Runtime-only) ---
 # Install cuDNN 9.3 for getting compatibility with tensorflow 2.14 -> https://www.tensorflow.org/install/source#gpu
-RUN apt-get update && apt-get remove -y --allow-change-held-packages "libcudnn9-cuda-12=9.3.0.75-1" || true
-
-# exakt 9.3.0.75 für CUDA 12.5 installieren
-RUN wget -q https://developer.download.nvidia.com/compute/cudnn/9.3.0/local_installers/cudnn-local-repo-ubuntu2204-9.3.0_1.0-1_amd64.deb -O /tmp/libcudnn9-cuda-12.deb \
-    && dpkg -i /tmp/libcudnn9-cuda-12.deb \
-    && rm -f /tmp/libcudnn9-cuda-12.deb \
+RUN wget -q https://developer.download.nvidia.com/compute/cudnn/9.3.0/local_installers/cudnn-local-repo-ubuntu2204-9.3.0_1.0-1_amd64.deb -O /tmp/cudnn.deb \
+    && dpkg -i /tmp/cudnn.deb \
+    && cp /var/cudnn-local-repo-ubuntu2204-9.3.0/cudnn-*-keyring.gpg /usr/share/keyrings/ \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends "libcudnn9-cuda-12=9.3.0.75-1" \
     && ldconfig \
-    && apt-mark hold libcudnn9-cuda-12
+    && apt-mark hold libcudnn9-cuda-12 \
+    && rm -f /tmp/cudnn.deb \
+    && rm -rf /var/lib/apt/lists/*
