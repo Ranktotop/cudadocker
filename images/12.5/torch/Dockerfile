@@ -20,3 +20,6 @@ RUN mkdir -p /opt/python/torch \
     torch_pitch_shift \
     torchmetrics \
     --target /opt/python/torch
+
+# create constraint file for preventing torch reinstalls
+RUN python3 -m pip freeze --path /opt/python/torch > /opt/python/torch/constraints_torch.txt
