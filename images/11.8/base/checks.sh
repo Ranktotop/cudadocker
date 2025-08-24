@@ -16,6 +16,14 @@ else
   echo "[OK] CUB_HOME ist gesetzt und gültig"
 fi
 
+echo "[CHECK] CUDA symlink:"; readlink -f /usr/local/cuda
+test -d /usr/local/cuda/include/cub && echo "[OK] CUB headers da" || { echo "[FAIL] CUB fehlt"; exit 1; }
+python3 - <<'PY'
+import ctypes; 
+ctypes.CDLL("libcudart.so"); 
+print("[OK] libcudart ladbar")
+PY
+
 echo "[CHECK] cuDNN-Version..."
 if dpkg -s libcudnn8 2>/dev/null | grep -q "Version: 8.7.0.84-1+cuda11.8"; then
   echo "[OK] libcudnn8 ist 8.7.0.84-1+cuda11.8"
