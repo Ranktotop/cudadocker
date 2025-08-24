@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     yasm nasm meson ninja-build \
     libass-dev libfreetype6-dev libfontconfig1-dev \
     libmp3lame-dev libopus-dev libvorbis-dev libvpx-dev \
+    libx264-dev libfdk-aac-dev \
     libx264-dev \
     libgnutls28-dev \
     libnuma-dev \
@@ -56,7 +57,6 @@ WORKDIR /root/ffmpeg_sources/ffmpeg
 RUN PKG_CONFIG_PATH="/root/ffmpeg_build/lib/pkgconfig" \
     ./configure \
     --prefix="/root/ffmpeg_build" \
-    --pkg-config-flags="--static" \
     --extra-cflags="-I/root/ffmpeg_build/include -I/usr/local/cuda/include" \
     --extra-ldflags="-L/root/ffmpeg_build/lib -L/usr/local/cuda/lib64/stubs -L/usr/local/cuda/lib64" \
     --bindir="/root/bin" \
