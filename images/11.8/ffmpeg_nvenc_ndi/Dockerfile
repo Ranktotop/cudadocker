@@ -42,10 +42,7 @@ WORKDIR /tmp/ffmpeg-build/ffmpeg
 COPY ndi-support.patch ./ndi-support.patch
 RUN patch -p1 < ndi-support.patch
 
-ARG CFG_REV=2
-
 # FFmpeg konfigurieren (NDI+NVENC+Codecs; dynamisch gelinkt)
-# <<< ADDED: PKG_CONFIG_PATH erweitert (ffnvcodec.pc) + Avahi-Libs an den Linker
 RUN AVAHI_LIBS="$(pkg-config --libs avahi-client 2>/dev/null || echo -lavahi-client) -lavahi-common" && \
     PKG_CONFIG_PATH="/usr/local/lib/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig" \
     ./configure \
@@ -86,6 +83,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libvpx7 \
     libgnutls30 \
     libx264-163 \
+    libx265-199 \
     libfdk-aac2 \
     libnuma1 \
     # <<< ADDED: Avahi Runtime (libndi braucht diese .so)
