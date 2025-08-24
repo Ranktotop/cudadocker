@@ -80,8 +80,8 @@ RUN mkdir -p /root/ffmpeg_runtime/usr/local/lib && \
 
 # Benötigte CUDA NPP-Libs für --enable-libnpp ins Runtime bündeln (sonst fehlt libnpp*.so zur Laufzeit)
 # (Wir kopieren NUR libnpp*.so*, nicht die Toolchain)
-RUN mkdir -p /root/ffmpeg_runtime/usr/local/cuda/lib64 && \
-    cp -a /usr/local/cuda/lib64/libnpp*.so* /root/ffmpeg_runtime/usr/local/cuda/lib64/ || true
+RUN mkdir -p /root/ffmpeg_runtime/usr/local/lib && \
+    cp -a /usr/local/cuda/lib64/libnpp*.so* /root/ffmpeg_runtime/usr/local/lib/ || true
 
 #########################
 # Stage 2: Runtime-Base #
@@ -104,7 +104,7 @@ COPY --from=build /root/bin/ffmpeg  /usr/local/bin/ffmpeg
 COPY --from=build /root/bin/ffprobe /usr/local/bin/ffprobe
 
 # FFmpeg-eigene libs (falls vorhanden) + NPP-Libs
-COPY --from=build /root/ffmpeg_runtime/ //
+COPY --from=build /root/ffmpeg_runtime/usr/local/lib/ /usr/local/lib/
 
 # Loader-Cache aktualisieren
 RUN ldconfig || true
