@@ -28,8 +28,8 @@ RUN wget -q https://developer.download.nvidia.com/compute/cudnn/8.9.7/local_inst
     && dpkg -i /tmp/cudnn.deb \
     && cp /var/cudnn-local-repo-ubuntu2204-8.9.7.29/cudnn-*-keyring.gpg /usr/share/keyrings/ \
     && apt-get update \
-    && apt-get install -y --no-install-recommends cudnn-cuda-12 \
-    && apt-mark hold cudnn-cuda-12 \
+    && apt-get install -y --no-install-recommends "libcudnn8=8.9.7.29-1+cuda12.5" \
+    && apt-mark hold libcudnn8 \
     && ldconfig \
     && rm -f /tmp/cudnn.deb \
     && rm -rf /var/lib/apt/lists/*
