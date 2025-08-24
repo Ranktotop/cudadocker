@@ -37,7 +37,7 @@ find_project_root() {
 ROOT_DIR="$(find_project_root)" || { log_error "Projektwurzel '$REPO_NAME' nicht gefunden. Setze ggf. ROOT_DIR."; exit 1; }
 DOCKERFILE_PATH="$ROOT_DIR/$DOCKERFILE_REL"
 CONTEXT_DIR="$(dirname "$DOCKERFILE_PATH")"
-IMAGE_TAG="cuda-base-test:latest"
+IMAGE_TAG="$REPO_NAME:11.8_base"
 
 [ -f "$DOCKERFILE_PATH" ] || { log_error "Dockerfile nicht gefunden: $DOCKERFILE_PATH"; exit 1; }
 
