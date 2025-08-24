@@ -28,13 +28,11 @@ RUN mkdir -p /opt/ndi-sdk && \
     echo "/opt/ndi-sdk/lib/x86_64-linux-gnu" > /etc/ld.so.conf.d/ndi.conf && ldconfig
 
 # FFmpeg Quelle + (optional) NDI Patch
-# Falls du einen Patch brauchst, lege ihn als "ndi-support.patch" neben dieses Dockerfile.
 RUN wget -O ffmpeg-6.1.1.tar.gz https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n6.1.1.tar.gz && \
     tar -xzf ffmpeg-6.1.1.tar.gz && mv FFmpeg-n6.1.1 ffmpeg
 WORKDIR /tmp/ffmpeg-build/ffmpeg
-# (Optional) Patch einspielen, falls vorhanden:
-# COPY ndi-support.patch ./ndi-support.patch
-# RUN patch -p1 < ndi-support.patch
+COPY ndi-support.patch ./ndi-support.patch
+RUN patch -p1 < ndi-support.patch
 
 # FFmpeg konfigurieren (NDI+NVENC+Codecs; dynamisch gelinkt)
 RUN PKG_CONFIG_PATH="/usr/lib/x86_64-linux-gnu/pkgconfig" \
