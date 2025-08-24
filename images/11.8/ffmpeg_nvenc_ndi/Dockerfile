@@ -57,7 +57,7 @@ RUN PKG_CONFIG_PATH="/usr/lib/x86_64-linux-gnu/pkgconfig" \
 #########################
 # Stage 2: Runtime-Base #
 #########################
-FROM cudadocker:11.8_base
+FROM ranktotop/cudadocker:11.8_base
 
 # Runtime-Libs (für dynamische Codecs) – klein, aber vollständig
 RUN apt-get update && apt-get install -y --no-install-recommends \
