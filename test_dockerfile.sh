@@ -109,7 +109,7 @@ build_docker_image() {
 # Test Docker image
 test_docker_image() {
     log_info "Starte Runtime-Checks..."
-    docker run --rm -i "$IMAGE_TAG" bash -s < "$CHECKFILE_PATH" \
+    docker run --rm -i "$IMAGE_TAG" --gpus all bash -s < "$CHECKFILE_PATH" \
         || { log_error "❌ Checks fehlgeschlagen."; exit 1; }
     log_info "✅ Alle Checks bestanden."
 }

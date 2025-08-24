@@ -1,0 +1,44 @@
+FROM ranktotop/cudadocker:118_base
+
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    pkg-config \
+    yasm \
+    nasm \
+    gcc \
+    g++ \
+    cmake \
+    libx264-dev \
+    libx265-dev \
+    libvpx-dev \
+    libfdk-aac-dev \
+    libvorbis-dev \
+    libopus-dev \
+    libavcodec-dev \
+    libavformat-dev \
+    libswscale-dev \
+    libfreetype6-dev \
+    libfontconfig1-dev \
+    libass-dev && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+#######################################
+########### INSTALL NVENC #############
+#######################################
+
+# Installiere das CUDA-Toolkit 11.8, um sicherzustellen, dass alle CUDA-Tools verfügbar sind
+RUN apt-get update && apt-get install -y cuda-toolkit-11-8
+
+# Klone die nv-codec-headers in Version 11.1.5.3
+RUN git clone https://git.videolan.org/git/ffmpeg/nv-codec-headers.git /tmp/nv-codec-headers && \
+    cd /tmp/nv-codec-headers && \
+    git checkout 43d91706e097565f57b311e567f0219838bcc2f6 && \
+    make && \
+    make install && \
+    cd -
+
+# Erstellen von Symlinks für CUDA-Bibliotheken
+RUN ln -s /usr/local/cuda/lib64/stubs/libcuda.so /usr/lib/libcuda.so && \
+    ln -s /usr/local/cuda/lib64/stubs/libnvcuvid.so /usr/lib/libnvcuvid.so && \
+    ln -s /usr/local/cuda/lib64/stubs/libnvidia-encode.so /usr/lib/libnvidia-encode.so
