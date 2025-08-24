@@ -15,7 +15,7 @@ RESOLVED_CUDA="$(readlink -f "$CUDA_HOME" || echo "$CUDA_HOME")"
 echo "[OK] CUDA_HOME: $CUDA_HOME -> $RESOLVED_CUDA"
 
 echo "[CHECK] cuDNN-Version..."
-# Erwartet: cuDNN 9.3 für CUDA 12.x, installiert über cudnn-local-repo als Meta-Paket "cudnn-cuda-12"
+# Erwartet: cuDNN 9.3 für CUDA 12.x, installiert über cudnn-local-repo als Paket "libcudnn9-cuda-12"
 if dpkg -s libcudnn9-cuda-12 2>/dev/null | grep -q "Version: 9.3.0"; then
   echo "[OK] libcudnn9-cuda-12 ist 9.3.0 (cuDNN 9.3)"
 else
