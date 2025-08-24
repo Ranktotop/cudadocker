@@ -32,5 +32,6 @@ RUN printf '%s\n' \
     'torch-audiomentations==0.11.2' \
     'torch_pitch_shift==1.2.5' \
     'torchmetrics==1.6.1' \
+    'sympy==1.13.1' \
     'numpy<2' \
     > /opt/python/torch/constraints_torch.txt
