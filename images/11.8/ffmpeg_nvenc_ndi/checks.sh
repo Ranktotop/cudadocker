@@ -4,6 +4,11 @@ set -e
 echo "[CHECK] ffmpeg-ndi vorhanden?"
 ffmpeg-ndi -hide_banner -version
 
+echo "[CHECK] NDI-Library gelinkt?"
+ldd "$(command -v ffmpeg-ndi)" | grep -qi 'libndi' \
+  && echo "[OK] libndi verlinkt" \
+  || { echo "[FAIL] libndi nicht verlinkt"; exit 1; }
+
 echo "[CHECK] Build-Flags (NDI/NVENC/HTTPS/Codecs)..."
 BUILD="$(ffmpeg-ndi -hide_banner -buildconf 2>/dev/null || true)"
 for flag in \

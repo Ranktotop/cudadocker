@@ -40,6 +40,7 @@ RUN PKG_CONFIG_PATH="/usr/lib/x86_64-linux-gnu/pkgconfig" \
     --prefix="/opt/ffmpeg-ndi" \
     --extra-cflags="-I/opt/ndi-sdk/include -I/usr/local/cuda/include" \
     --extra-ldflags="-L/opt/ndi-sdk/lib/x86_64-linux-gnu -L/usr/local/cuda/lib64 -Wl,-rpath,/opt/ndi-sdk/lib/x86_64-linux-gnu" \
+    --extra-libs="-ldl -lpthread" \
     --bindir="/opt/ffmpeg-ndi/bin" \
     --libdir="/opt/ffmpeg-ndi/lib" \
     --enable-gpl --enable-nonfree \
