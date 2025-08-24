@@ -30,14 +30,16 @@ RUN git clone https://github.com/breakfastquay/rubberband.git && \
     meson setup builddir --prefix=/root/ffmpeg_build --libdir=lib && \
     ninja -C builddir && ninja -C builddir install
 
-# x265 (statisch)
+# x265 kompilieren (Shared)
 WORKDIR /root/ffmpeg_sources
 RUN wget -O x265.tar.bz2 "https://bitbucket.org/multicoreware/x265_git/get/master.tar.bz2" && \
     tar xjvf x265.tar.bz2 && \
     cd multicoreware*/build/linux && \
     cmake -G "Unix Makefiles" \
     -DCMAKE_INSTALL_PREFIX="/root/ffmpeg_build" \
-    -DENABLE_SHARED=off ../../source && \
+    -DENABLE_SHARED=ON \
+    -DENABLE_CLI=OFF \
+    ../../source && \
     make -j"$(nproc)" && make install
 
 # NVENC-Header (Video Codec SDK)
@@ -93,6 +95,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libvpx7 \
     libgnutls30 \
     libfftw3-3 libsamplerate0 libsndfile1 \
+    libx264-163 \
+    libfdk-aac2 \
     && rm -rf /var/lib/apt/lists/*
 
 # FFmpeg-Binaries
