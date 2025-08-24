@@ -24,10 +24,14 @@ RUN apt-get update \
 
 # --- cuDNN strikt auf 8.9.7 pinnen (Runtime-only) ---
 # Install cuDNN 8.9.7 for getting compatibility with tensorflow 2.14 -> https://www.tensorflow.org/install/source#gpu
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-    "libcudnn8=8.9.7.*-1+cuda12.5" \
-    && apt-mark hold libcudnn8 \
+RUN wget -q https://developer.download.nvidia.com/compute/cudnn/8.9.7/local_installers/cudnn-local-repo-ubuntu2204-8.9.7.29_1.0-1_amd64.deb -O /tmp/cudnn.deb \
+    && dpkg -i /tmp/cudnn.deb \
+    && cp /var/cudnn-local-repo-ubuntu2204-8.9.7.29/cudnn-*-keyring.gpg /usr/share/keyrings/ \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends cudnn-cuda-12 \
+    && apt-mark hold cudnn-cuda-12 \
+    && ldconfig \
+    && rm -f /tmp/cudnn.deb \
     && rm -rf /var/lib/apt/lists/*
 
 
