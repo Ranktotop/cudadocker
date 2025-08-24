@@ -9,6 +9,7 @@ log_error()   { echo "[ERROR] $1"; }
 # -------- config --------
 REPO_NAME="cudadocker"                 # Projektordner-Name für Root-Detection
 DOCKERFILE_REL="images/11.8/base/Dockerfile"
+CHECK_REL="images/11.8/base/checks.sh" # ausgelagertes Run-Command
 export DOCKER_BUILDKIT=${DOCKER_BUILDKIT:-1}
 
 # -------- project root detection --------
@@ -36,52 +37,25 @@ find_project_root() {
 
 ROOT_DIR="$(find_project_root)" || { log_error "Projektwurzel '$REPO_NAME' nicht gefunden. Setze ggf. ROOT_DIR."; exit 1; }
 DOCKERFILE_PATH="$ROOT_DIR/$DOCKERFILE_REL"
+CHECK_PATH="$ROOT_DIR/$CHECK_REL"
 CONTEXT_DIR="$(dirname "$DOCKERFILE_PATH")"
 IMAGE_TAG="$REPO_NAME:11.8_base"
 
 [ -f "$DOCKERFILE_PATH" ] || { log_error "Dockerfile nicht gefunden: $DOCKERFILE_PATH"; exit 1; }
+[ -f "$CHECK_PATH" ]      || { log_error "Check-Skript nicht gefunden: $CHECK_PATH"; exit 1; }
 
 log_info "Projekt-Root: $ROOT_DIR"
 log_info "Dockerfile:   $DOCKERFILE_PATH"
+log_info "Check-Skript: $CHECK_PATH"
 
 # -------- build --------
 log_info "Baue Image ($IMAGE_TAG)..."
-docker build -q -f "$DOCKERFILE_PATH" -t "$IMAGE_TAG" "$CONTEXT_DIR" || { log_error "Build fehlgeschlagen"; exit 1; }
+DOCKER_BUILDKIT=1 docker build --progress=plain -f "$DOCKERFILE_PATH" -t "$IMAGE_TAG" "$CONTEXT_DIR" || { log_error "Build fehlgeschlagen"; exit 1; }
 log_info "Build OK."
 
 # -------- single-run test --------
-log_info "Starte Runtime-Checks (cuDNN 8.7 & CUDA-Libs)..."
-docker run --rm "$IMAGE_TAG" bash -lc '
-set -e
-echo "[CHECK] cuDNN-Version..."
-if dpkg -s libcudnn8 2>/dev/null | grep -q "Version: 8.7.0.84-1+cuda11.8"; then
-  echo "[OK] libcudnn8 ist 8.7.0.84-1+cuda11.8"
-else
-  echo "[FAIL] libcudnn8 nicht korrekt gepinnt (erwartet 8.7.0.84-1+cuda11.8)"
-  dpkg -s libcudnn8 || true
-  exit 1
-fi
-
-echo "[CHECK] CUDA/BLAS/cuDNN Libraries ladbar..."
-python3 - <<PY
-import sys, ctypes
-def load_any(names):
-    for n in names:
-        try:
-            ctypes.CDLL(n)
-            print("[OK]", n)
-            return True
-        except OSError:
-            pass
-    print("[FAIL] none of", names, "could be loaded")
-    return False
-
-ok = True
-ok &= load_any(["libcudart.so","libcudart.so.11.0"])
-ok &= load_any(["libcublas.so","libcublas.so.11"])
-ok &= load_any(["libcudnn.so.8","libcudnn.so"])
-sys.exit(0 if ok else 1)
-PY
-' || { log_error "❌ Checks fehlgeschlagen."; exit 1; }
+log_info "Starte Runtime-Checks..."
+# -i ist wichtig, damit STDIN (die Check-Datei) durchgereicht wird
+docker run --rm -i "$IMAGE_TAG" bash -s < "$CHECK_PATH" || { log_error "❌ Checks fehlgeschlagen."; exit 1; }
 
 log_info "✅ Alle Checks bestanden."
