@@ -7,12 +7,12 @@ ENV DEBIAN_FRONTEND=noninteractive \
     TF_CPP_MIN_LOG_LEVEL=3
 
 #check compatibility here -> https://www.tensorflow.org/install/source#gpu
-#install 2.16.1 instead of 2.18 to surpress message Unable to register cuDNN factory... and Unable to register cuBLAS factory...
+#install 2.18.0 for beeing compatible with cudnn 9.3
 RUN mkdir -p /opt/python/tf \
     && python3 -m pip install --upgrade pip setuptools wheel \
     && python3 -m pip install \
     "numpy<2" \
-    tensorflow==2.16.1 \
+    tensorflow==2.18.0 \
     tensorflow-hub \
-    tensorboard==2.16.1 \
+    tensorboard==2.18.0 \
     --target /opt/python/tf

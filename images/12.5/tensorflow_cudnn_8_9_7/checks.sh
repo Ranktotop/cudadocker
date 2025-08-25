@@ -10,6 +10,12 @@ TF_ROOT="/opt/python/tf"
 [ -d "$TF_ROOT" ] || fail "TF_ROOT fehlt: $TF_ROOT"
 [ -d "$TF_ROOT/tensorflow" ] || fail "TensorFlow-Paket fehlt: $TF_ROOT/tensorflow"
 
+# 0.1) cuDNN 8.9.3 aus dem Base prüfen (Package)
+echo "[CHECK] cuDNN (erwartet 8.9.3.* + CUDA 12.x)"
+dpkg -s libcudnn9-cuda-12 2>/dev/null | grep -q "Version: 8.9.3" \
+  && echo "[OK] cuDNN 8.9.3 korrekt gepinnt" \
+  || { echo "[FAIL] cuDNN nicht korrekt gepinnt (erwartet libcudnn9-cuda-12 8.9.3.*)"; dpkg -s libcudnn9-cuda-12 || true; exit 1; }
+
 # 1) Laufzeitpfade setzen (nur für diesen Check)
 export PYTHONPATH="$TF_ROOT:${PYTHONPATH:-}"
 
