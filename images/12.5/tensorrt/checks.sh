@@ -7,9 +7,14 @@ dpkg -s libcudnn9-cuda-12 2>/dev/null | grep -q "Version: 9.3.0" \
   || { echo "[FAIL] cuDNN nicht korrekt gepinnt (erwartet libcudnn9-cuda-12 9.3.0.*)"; dpkg -s libcudnn9-cuda-12 || true; exit 1; }
 
 echo "[CHECK] TensorRT Paketversionen (10.3.0.26-1+cuda12.5)"
-for p in libnvinfer-lean10 libnvinfer-vc-plugin10 libnvinfer-dispatch10 libnvinfer-headers-dev \
-         libnvinfer10 libnvinfer-dev libnvinfer-plugin10 libnvinfer-bin \
-         libnvonnxparsers10 libnvonnxparsers-dev
+for p in \
+  libnvinfer10 \
+  libnvinfer-plugin10 \
+  libnvinfer-bin \
+  libnvonnxparsers10 \
+  libnvinfer-lean10 \
+  libnvinfer-vc-plugin10 \
+  libnvinfer-dispatch10
 do
   dpkg -s "$p" 2>/dev/null | grep -q "Version: 10.3.0.26-1+cuda12.5" \
     && echo "[OK] $p" \
