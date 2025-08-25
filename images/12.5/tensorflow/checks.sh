@@ -90,7 +90,7 @@ if [ -d "$TF_ROOT/tensorflow/python" ]; then
   ls -1 "$TF_ROOT"/tensorflow/python | head -n 8 | sed 's/^/[INFO]   /' || true
 fi
 
-# 4) optional: nvidia-smi
+# 4) nvidia-smi
 if command -v nvidia-smi >/dev/null 2>&1; then
   echo "[INFO] nvidia-smi:"
   nvidia-smi -L || true

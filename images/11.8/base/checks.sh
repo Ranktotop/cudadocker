@@ -23,6 +23,12 @@ else
   exit 1
 fi
 
+# nvidia-smi
+if command -v nvidia-smi >/dev/null 2>&1; then
+  echo "[INFO] nvidia-smi:"
+  nvidia-smi -L || true
+fi
+
 echo "[CHECK] CUDA/BLAS/cuDNN Libraries ladbar..."
 python3 - <<'PY'
 import sys, ctypes
