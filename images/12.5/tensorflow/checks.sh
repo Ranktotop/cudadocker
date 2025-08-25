@@ -11,10 +11,10 @@ TF_ROOT="/opt/python/tf"
 [ -d "$TF_ROOT/tensorflow" ] || fail "TensorFlow-Paket fehlt: $TF_ROOT/tensorflow"
 
 # 0.1) cuDNN 9.3 aus dem Base prüfen (Package)
-echo "[CHECK] cuDNN (erwartet 8.9.7.* + CUDA 12.x)"
-dpkg -s libcudnn8 2>/dev/null | grep -q "Version: 8.9.7." \
-  && echo "[OK] cuDNN 8.9.7 korrekt gepinnt" \
-  || { echo "[FAIL] cuDNN nicht korrekt gepinnt (erwartet libcudnn8 8.9.7.*)"; dpkg -s libcudnn8 || true; exit 1; }
+echo "[CHECK] cuDNN (erwartet 9.3.0.* + CUDA 12.x)"
+dpkg -s libcudnn9-cuda-12 2>/dev/null | grep -q "Version: 9.3.0" \
+  && echo "[OK] cuDNN 9.3 korrekt gepinnt" \
+  || { echo "[FAIL] cuDNN nicht korrekt gepinnt (erwartet libcudnn9-cuda-12 9.3.0.*)"; dpkg -s libcudnn9-cuda-12 || true; exit 1; }
 
 # 1) Laufzeitpfade setzen (nur für diesen Check)
 export PYTHONPATH="$TF_ROOT:${PYTHONPATH:-}"
@@ -38,12 +38,12 @@ try:
 except Exception as e:
     print("[FAIL] numpy Import/Check:", e); sys.exit(1)
 
-# TensorFlow importieren und Version prüfen (2.16.1)
+# TensorFlow importieren und Version prüfen (2.18.x)
 try:
     import tensorflow as tf
     print("[OK] tensorflow", tf.__version__)
-    if not tf.__version__.startswith("2.16.1"):
-        print("[FAIL] Unerwartete TF-Version – erwarte 2.16.1"); sys.exit(1)
+    if not tf.__version__.startswith("2.18"):
+        print("[FAIL] Unerwartete TF-Version – erwarte 2.18.x"); sys.exit(1)
 except Exception as e:
     print("[FAIL] tensorflow Import:", e); sys.exit(1)
 
@@ -90,7 +90,7 @@ if [ -d "$TF_ROOT/tensorflow/python" ]; then
   ls -1 "$TF_ROOT"/tensorflow/python | head -n 8 | sed 's/^/[INFO]   /' || true
 fi
 
-# 4) optional: nvidia-smi
+# 4) nvidia-smi
 if command -v nvidia-smi >/dev/null 2>&1; then
   echo "[INFO] nvidia-smi:"
   nvidia-smi -L || true
