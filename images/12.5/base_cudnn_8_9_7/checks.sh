@@ -10,9 +10,9 @@ TF_ROOT="/opt/python/tf"
 [ -d "$TF_ROOT" ] || fail "TF_ROOT fehlt: $TF_ROOT"
 [ -d "$TF_ROOT/tensorflow" ] || fail "TensorFlow-Paket fehlt: $TF_ROOT/tensorflow"
 
-# 0.1) cuDNN 8.9.7 aus dem Base prüfen (Package)
+# 0.1) cuDNN 9.3 aus dem Base prüfen (Package)
 echo "[CHECK] cuDNN (erwartet 8.9.7.* + CUDA 12.x)"
-dpkg -s libcudnn8 2>/dev/null | grep -q "Version: 8.9.7" \
+dpkg -s libcudnn8 2>/dev/null | grep -q "Version: 8.9.7.29-1+cuda12.2" \
   && echo "[OK] cuDNN 8.9.7 korrekt gepinnt" \
   || { echo "[FAIL] cuDNN nicht korrekt gepinnt (erwartet libcudnn8 8.9.7.*)"; dpkg -s libcudnn8 || true; exit 1; }
 
@@ -72,28 +72,4 @@ try:
 except Exception as e:
     print("[FAIL] GPU-Op fehlgeschlagen:", e); sys.exit(3)
 
-# Build-Info (nur Info, kein Fail)
-try:
-    from tensorflow.python.platform import build_info as tfbi
-    bi = tfbi.build_info
-    print("[INFO] build cuda:", bi.get('cuda_version'), "cudnn:", bi.get('cudnn_version'))
-except Exception as e:
-    try:
-        print("[INFO] sysconfig build:", tf.sysconfig.get_build_info())
-    except Exception as e2:
-        print("[INFO] build info nicht verfügbar:", e, "|", e2)
-PY
-
-# 3) (optional) ein paar Dateien listen (nur Info)
-if [ -d "$TF_ROOT/tensorflow/python" ]; then
-  echo "[INFO] Beispiel .so/.py in tensorflow/python:"
-  ls -1 "$TF_ROOT"/tensorflow/python | head -n 8 | sed 's/^/[INFO]   /' || true
-fi
-
-# 4) optional: nvidia-smi
-if command -v nvidia-smi >/dev/null 2>&1; then
-  echo "[INFO] nvidia-smi:"
-  nvidia-smi -L || true
-fi
-
-echo "[SUCCESS] TensorFlow-PKG OK (GPU sichtbar)"
+# Build-Info (nur Info, kein
