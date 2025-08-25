@@ -18,7 +18,7 @@ python3 - <<'PY'
 import sys, os
 print("[OK] python", sys.version.split()[0])
 
-# NumPy-Version prüfen (TF 2.14 erwartet <2)
+# NumPy-Version prüfen (TF 2.16.1 erwartet <2)
 try:
     import numpy as np
     from packaging import version
