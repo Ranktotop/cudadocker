@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
-# batch runner
-set -uo pipefail
-[[ "${DEBUG:-0}" == 1 ]] && set -x
+# batch runner for test_dockerfile.sh
+# ASCII-only, LF line endings required
+
+set -euo pipefail
+
+# -------- config --------
+BUILD_SCRIPT="${BUILD_SCRIPT:-./test_dockerfile.sh}"
 
 SCRIPTS=(
   "11.8 base"
@@ -22,88 +26,135 @@ SCRIPTS=(
   "12.5 torch_cudnn_8_9_7"
 )
 
-BUILD_SCRIPT="./test_dockerfile.sh"
+# -------- logging (ASCII) --------
+log_i(){ printf '[INFO] %s\n' "$*"; }
+log_w(){ printf '[WARN] %s\n' "$*" >&2; }
+log_e(){ printf '[ERROR] %s\n' "$*" >&2; }
+log_s(){ printf '[SUCCESS] %s\n' "$*"; }
 
-log_info()      { echo "[BATCH-INFO] $*"; }
-log_error()     { echo "[BATCH-ERROR] $*" >&2; }
-log_success()   { echo "[BATCH-SUCCESS] $*"; }
+# -------- opts --------
+CONTINUE=false
+DRY=false
 
-CONTINUE_ON_ERROR=false
-DRY_RUN=false
-
-show_usage() {
-  cat <<EOF
-Usage: $0 [-c] [-d]
-  -c, --continue-on-error  bei Fehlern weitermachen
-  -d, --dry-run            nur anzeigen, was gebaut würde
+usage() {
+  cat <<'EOF'
+Usage: ./test_all_dockerfiles.sh [OPTIONS]
+  -c, --continue-on-error   continue on errors
+  -d, --dry-run             print planned builds only
+  -h, --help                show this help
 EOF
 }
 
 while (($#)); do
   case "$1" in
-    -c|--continue-on-error) CONTINUE_ON_ERROR=true ;;
-    -d|--dry-run)           DRY_RUN=true ;;
-    -h|--help)              show_usage; exit 0 ;;
-    *) log_error "Unbekannte Option: $1"; show_usage; exit 1 ;;
+    -c|--continue-on-error) CONTINUE=true ;;
+    -d|--dry-run)           DRY=true ;;
+    -h|--help)              usage; exit 0 ;;
+    *) log_e "unknown option: $1"; usage; exit 1 ;;
   esac
   shift
 done
 
+# -------- helpers --------
 check_build_script() {
   if [[ ! -f "$BUILD_SCRIPT" ]]; then
-    log_error "Build-Script nicht gefunden: $BUILD_SCRIPT"; exit 1
+    log_e "build script not found: $BUILD_SCRIPT"
+    exit 1
   fi
 }
 
-run_single_build() {
+run_one() {
   local params="$1"
-  local cuda_version image_name
-  IFS=' ' read -r cuda_version image_name <<<"$params"
+  local cuda="" image=""
 
-  if [[ -z "${cuda_version:-}" || -z "${image_name:-}" ]]; then
-    log_error "Ungültige Parameter: '$params'"; return 2
+  # split exactly two fields
+  read -r cuda image <<<"$params"
+
+  if [[ -z "$cuda" || -z "$image" ]]; then
+    log_e "bad params: [$params] (need: CUDA_VERSION IMAGE_NAME)"
+    return 2
   fi
 
-  log_info "Starte Build für: CUDA ${cuda_version}, Image ${image_name}"
+  log_i "start build: cuda=$cuda image=$image"
 
-  # --- wichtig: Exit-on-error AUS für den Call ---
+  # run child and capture exit code without killing the loop
   set +e
-  bash "$BUILD_SCRIPT" "$cuda_version" "$image_name"
+  bash "$BUILD_SCRIPT" "$cuda" "$image"
   local rc=$?
   set -e
-  # ----------------------------------------------
 
   if [[ $rc -eq 0 ]]; then
-    log_success "Build OK: ${cuda_version} ${image_name}"
+    log_s "build ok: $cuda $image"
   else
-    log_error   "Build FAIL ($rc): ${cuda_version} ${image_name}"
+    log_e "build failed ($rc): $cuda $image"
   fi
-  return "$rc"
+  return $rc
 }
 
-show_summary() {
-  local total=$1 ok=$2 fail=$3
+summary() {
+  local total="$1" ok="$2" fail="$3"
   echo
-  echo "==================== ZUSAMMENFASSUNG ===================="
-  log_info     "Gesamt:        $total"
-  log_success  "Erfolgreich:   $ok"
-  log_error    "Fehlgeschlagen:$fail"
-  echo "=========================================================="
+  echo "================ summary ================"
+  log_i "total:       $total"
+  log_s "ok:          $ok"
+  log_e "failed:      $fail"
+  echo "========================================="
 }
 
+# -------- main --------
 main() {
-  log_info "Batch Build Script gestartet"
-  log_info "Build-Script: $BUILD_SCRIPT"
-  log_info "Anzahl Builds: ${#SCRIPTS[@]}"
-  log_info "Continue on error: $CONTINUE_ON_ERROR"
-  log_info "Dry run: $DRY_RUN"
+  # enforce C locale to avoid encoding surprises
+  export LC_ALL=C LANG=C
 
-  if $DRY_RUN; then
-    echo; log_info "DRY RUN:"
-    printf '  %s\n' "${SCRIPTS[@]}"; exit 0
+  log_i "batch started"
+  log_i "build script: $BUILD_SCRIPT"
+  log_i "build count: ${#SCRIPTS[@]}"
+  log_i "continue on error: $CONTINUE"
+  log_i "dry run: $DRY"
+
+  if $DRY; then
+    echo
+    log_i "dry-run list:"
+    for s in "${SCRIPTS[@]}"; do
+      echo "  $s"
+    done
+    exit 0
   fi
 
   check_build_script
 
   local total=${#SCRIPTS[@]} ok=0 fail=0
-  echo;
+  echo
+  log_i "starting $total builds..."
+
+  local idx=0
+  for params in "${SCRIPTS[@]}"; do
+    ((idx++))
+    echo
+    log_i "[$idx/$total] $params"
+
+    if run_one "$params"; then
+      ((ok++))
+    else
+      ((fail++))
+      if ! $CONTINUE; then
+        log_e "stop on first failure (use -c to continue)"
+        summary "$total" "$ok" "$fail"
+        exit 1
+      else
+        log_w "continue after failure"
+      fi
+    fi
+  done
+
+  summary "$total" "$ok" "$fail"
+  if ((fail==0)); then
+    log_s "all builds completed"
+    exit 0
+  else
+    log_e "some builds failed"
+    exit 1
+  fi
+}
+
+main "$@"
