@@ -12,14 +12,14 @@ ENV DEBIAN_FRONTEND=noninteractive \
 #check compatible versions here -> https://pytorch.org/get-started/locally/
 RUN mkdir -p /opt/python/torch \
     && python3 -m pip install --upgrade pip setuptools wheel \
-    && python3 -m pip install --extra-index-url https://download.pytorch.org/whl/cu118 \
-    "numpy<2" \
-    torch \
-    torchvision \
-    torchaudio \
-    torch-audiomentations \
-    torch_pitch_shift \
-    torchmetrics \
+    && python3 -m pip install --extra-index-url https://download.pytorch.org/whl/cu124 \
+    "numpy>=2.0.2" \
+    torch==2.6.0 \
+    torchvision==0.21.0 \
+    torchaudio==2.6.0 \
+    torch-audiomentations==0.12.0 \
+    torch_pitch_shift==1.2.5 \
+    torchmetrics==1.8.1 \
     --target /opt/python/torch
 
 # create constraint file for preventing torch reinstalls

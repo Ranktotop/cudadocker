@@ -36,10 +36,10 @@ for m in ("torchvision","torchaudio","torch_audiomentations","torch_pitch_shift"
 # NumPy kompatibel?
 import numpy as np
 from packaging import version
-if version.parse(np.__version__).major >= 2:
-    print(f"[FAIL] numpy=={np.__version__} (>=2) – erwarte <2"); sys.exit(1)
+if version.parse(np.__version__).major < 2:
+    print(f"[FAIL] numpy=={np.__version__} (>=2) – erwarte ==2.0.2"); sys.exit(1)
 else:
-    print(f"[OK] numpy {np.__version__} (<2)")
+    print(f"[OK] numpy {np.__version__} (==2.0.2)")
 
 # GPU MUSS sichtbar sein
 if not torch.cuda.is_available():
