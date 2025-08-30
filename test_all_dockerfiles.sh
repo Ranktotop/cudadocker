@@ -18,8 +18,8 @@ SCRIPTS=(
     "12.5 tensorflow"
     "12.5 tensorflow_cudnn_8_9_7"
     "12.5 tensorrt"
-    "12.5 torch"
-    "12.5 torch_cudnn_8_9_7"
+    "12.5 torch_2_6_0"
+    "12.5 torch_2_6_0_cudnn_8_9_7"
 )
 
 # Name des auszuführenden Scripts
