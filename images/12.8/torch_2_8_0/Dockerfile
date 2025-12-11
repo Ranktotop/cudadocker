@@ -9,7 +9,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1
 
 # Pakete direkt in ein Zielverzeichnis installieren (kein venv!)
-#check compatible versions here -> https://pytorch.org/get-started/locally/
+#check compatible versions here -> https://github.com/pytorch/pytorch/blob/main/RELEASE.md#release-compatibility-matrix
 RUN mkdir -p /opt/python/torch \
     && python3 -m pip install --upgrade pip setuptools wheel \
     && python3 -m pip install --extra-index-url https://download.pytorch.org/whl/cu128 \

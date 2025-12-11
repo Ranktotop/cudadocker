@@ -22,13 +22,13 @@ RUN apt-get update \
     && apt-mark hold libcublas-12-8 libcublas-dev-12-8 \
     && rm -rf /var/lib/apt/lists/*
 
-# --- cuDNN strikt auf 9.3 pinnen (Runtime-only) ---
-# Install cuDNN 9.3 for getting compatibility with tensorflow 2.14 -> https://www.tensorflow.org/install/source#gpu
-RUN wget -q https://developer.download.nvidia.com/compute/cudnn/9.3.0/local_installers/cudnn-local-repo-ubuntu2204-9.3.0_1.0-1_amd64.deb -O /tmp/cudnn.deb \
+# --- cuDNN strikt auf 9.10.2.21 pinnen (Runtime-only) ---
+# Install cuDNN 9.10.2.21 for getting compatibility with torch  -> https://github.com/pytorch/pytorch/blob/main/RELEASE.md#release-compatibility-matrix
+RUN wget -q https://developer.download.nvidia.com/compute/cudnn/9.10.2/local_installers/cudnn-local-repo-ubuntu2204-9.10.2_1.0-1_amd64.deb -O /tmp/cudnn.deb \
     && dpkg -i /tmp/cudnn.deb \
-    && cp /var/cudnn-local-repo-ubuntu2204-9.3.0/cudnn-*-keyring.gpg /usr/share/keyrings/ \
+    && cp /var/cudnn-local-repo-ubuntu2204-9.10.2/cudnn-*-keyring.gpg /usr/share/keyrings/ \
     && apt-get update \
-    && apt-get install -y --no-install-recommends "libcudnn9-cuda-12=9.3.0.75-1" \
+    && apt-get install -y --no-install-recommends "libcudnn9-cuda-12=9.10.2.21-1" \
     && ldconfig \
     && apt-mark hold libcudnn9-cuda-12 \
     && rm -f /tmp/cudnn.deb \

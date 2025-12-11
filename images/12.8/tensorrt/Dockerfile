@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.6
 
-# Runtime-Layer: TensorRT 8.5.1 + CUDA 12.5, basierend auf deinem schlanken Base
+# Runtime-Layer: TensorRT 10.9.0.34 + CUDA 12.8, basierend auf deinem schlanken Base
 FROM ranktotop/cudadocker:12.8_base
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -13,9 +13,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends wget gnupg ca-c
     && apt-get purge -y --auto-remove gnupg wget \
     && rm -rf /var/lib/apt/lists/*
 
-# TensorRT 10.3.0.26 (Runtime) für CUDA 12.5 – strikt versioniert
+# TensorRT 10.3.0.26 (Runtime) für CUDA 12.8 – strikt versioniert
 #check available versions here: https://developer.download.nvidia.com/compute/cuda/repos/rhel8/x86_64/
-#check support matrix here: https://www.tensorflow.org/install/source#gpu
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     libnvinfer-lean10=10.9.0.34-1+cuda12.8 \
