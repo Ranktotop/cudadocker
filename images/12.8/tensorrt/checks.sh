@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 set -e
 
-echo "[CHECK] cuDNN (erwartet 9.3.0.* + CUDA 12.x)"
-dpkg -s libcudnn9-cuda-12 2>/dev/null | grep -q "Version: 9.3.0" \
-  && echo "[OK] cuDNN 9.3 korrekt gepinnt" \
-  || { echo "[FAIL] cuDNN nicht korrekt gepinnt (erwartet libcudnn9-cuda-12 9.3.0.*)"; dpkg -s libcudnn9-cuda-12 || true; exit 1; }
+echo "[CHECK] cuDNN (erwartet 9.10.* + CUDA 12.x)"
+dpkg -s libcudnn9-cuda-12 2>/dev/null | grep -q "Version: 9.10.2.21" \
+  && echo "[OK] cuDNN 9.10.2.21 korrekt gepinnt" \
+  || { echo "[FAIL] cuDNN nicht korrekt gepinnt (erwartet libcudnn9-cuda-12 9.10.2.21.*)"; dpkg -s libcudnn9-cuda-12 || true; exit 1; }
 
 echo "[CHECK] TensorRT Paketversionen (10.9.0.34-1+cuda12.8)"
 for p in \
