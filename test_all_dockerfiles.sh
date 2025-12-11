@@ -20,6 +20,10 @@ SCRIPTS=(
     "12.5 tensorrt"
     "12.5 torch_2_6_0"
     "12.5 torch_2_6_0_cudnn_8_9_7"
+    "12.8 base"
+    "12.8 ffmpeg_nvenc"
+    "12.8 tensorrt"
+    "12.8 torch_2_8_0"
 )
 
 # Name des auszuführenden Scripts
