@@ -85,7 +85,7 @@ RUN mkdir -p /root/ffmpeg_runtime/usr/local/lib && \
 #########################
 # Stage 2: Runtime-Base #
 #########################
-FROM ranktotop/cudadocker:12.5_base
+FROM ranktotop/cudadocker:12.8_base
 
 # Runtime-Libs für die dynamisch gelinkten Codecs/Filter (klein halten, aber vollständig)
 RUN apt-get update && apt-get install -y --no-install-recommends \
