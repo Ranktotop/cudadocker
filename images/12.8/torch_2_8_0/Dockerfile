@@ -13,7 +13,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
 RUN mkdir -p /opt/python/torch \
     && python3 -m pip install --upgrade pip setuptools wheel \
     && python3 -m pip install --extra-index-url https://download.pytorch.org/whl/cu128 \
-    "numpy>=2.0.2" \
+    "numpy>=2.0.2,<2.1.0" \
     torch==2.8.0 \
     torchvision==0.23.0 \
     torchaudio==2.8.0 \
