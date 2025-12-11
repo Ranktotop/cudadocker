@@ -18,8 +18,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # --- libcublas exakt pinnen ---
 RUN apt-get update \
     && apt-get install -y --allow-change-held-packages \
-    "libcublas-12-5=12.5.3.2-1" "libcublas-dev-12-5=12.5.3.2-1" \
-    && apt-mark hold libcublas-12-5 libcublas-dev-12-5 \
+    "libcublas-12-8=12.8.4.1-1" "libcublas-dev-12-8=12.8.4.1-1" \
+    && apt-mark hold libcublas-12-8 libcublas-dev-12-8 \
     && rm -rf /var/lib/apt/lists/*
 
 # --- cuDNN strikt auf 9.3 pinnen (Runtime-only) ---
